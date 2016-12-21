@@ -19,7 +19,7 @@ end
 
 function initplatforms ()
     if os.is ("windows") then
-        if string.lower(_ACTION) == "vs2013" then
+        if string.lower(_ACTION) == "vs2013" or string.lower(_ACTION) == "vs2015" then
             return
             {
                 "x64",
