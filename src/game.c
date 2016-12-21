@@ -1,5 +1,5 @@
 //! Includes
-#include "simpletest.h"
+#include "game.h"
 
 
 //! Variables

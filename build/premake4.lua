@@ -175,7 +175,8 @@ project "OrxTemplate"
     {
         "../src/**.c",
         "../src/**.cpp",
-        "../include/**.h"
+        "../include/**.h",
+        "../include/**.hpp"
     }
     targetname ("OrxTemplate")
 
