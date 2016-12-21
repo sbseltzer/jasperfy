@@ -1,0 +1,21 @@
+# bin/**/*.obj
+# bin/**/*.lib
+# bin/**/*.ncb
+# bin/**/*.idb
+# bin/**/*.o
+# bin/**/*.so
+# bin/**/*.dylib
+# bin/**/*.ilk
+# bin/**/*.pdb
+# bin/**/*.htm
+# bin/**/*.log
+# bin/**/*.cih
+# bin/**/*.sln
+# bin/**/*.vcxproj*
+# bin/**/*.suo
+# bin/**/*.user
+# bin/**/*.sdf
+# bin/**/*.exe
+bin/**/*
+build/**/*
+!build/premake4.*
