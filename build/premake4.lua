@@ -1,12 +1,33 @@
--- This premake script should be used with the orx-customized version of premake4.
--- Its Mercurial repository can be found at https://bitbucket.org/orx/premake-stable.
--- A copy, including binaries, can also be found in the extern/premake folder of any orx distributions.
+-- This premake script should be used with orx-customized version of premake4.
+-- Its Hg repository can be found at https://bitbucket.org/orx/premake-stable.
+-- A copy, including binaries, can also be found in the extern/premake folder.
 
 --
 -- Globals
 --
 
+function islinux64 ()
+    local pipe    = io.popen ("uname -m")
+    local content = pipe:read ('*a')
+    pipe:close ()
 
+    local t64 =
+    {
+        'x86_64',
+        'ia64',
+        'amd64',
+        'powerpc64',
+        'sparc64'
+    }
+
+    for i, v in ipairs (t64) do
+        if content:find (v) then
+            return true
+        end
+    end
+
+    return false
+end
 
 function initconfigurations ()
     return
@@ -19,7 +40,8 @@ end
 
 function initplatforms ()
     if os.is ("windows") then
-        if string.lower(_ACTION) == "vs2013" or string.lower(_ACTION) == "vs2015" then
+        if string.lower(_ACTION) == "vs2013"
+        or string.lower(_ACTION) == "vs2015" then
             return
             {
                 "x64",
@@ -31,18 +53,32 @@ function initplatforms ()
                 "Native"
             }
         end
-    elseif os.is64bit () then
-        return
-        {
-            "x64",
-            "x32"
-        }
-    else
-        return
-        {
-            "x32",
-            "x64"
-        }
+    elseif os.is ("linux") then
+        if islinux64 () then
+            return
+            {
+                "x64",
+                "x32"
+            }
+        else
+            return
+            {
+                "x32",
+                "x64"
+            }
+        end
+    elseif os.is ("macosx") then
+        if string.find(string.lower(_ACTION), "xcode") then
+            return
+            {
+                "Universal"
+            }
+        else
+            return
+            {
+                "x32", "x64"
+            }
+        end
     end
 end
 
@@ -52,9 +88,16 @@ function defaultaction (name, action)
    end
 end
 
-defaultaction ("windows", "vs2013")
+defaultaction ("windows", "vs2015")
 defaultaction ("linux", "gmake")
 defaultaction ("macosx", "gmake")
+
+newoption
+{
+    trigger = "to",
+    value   = "path",
+    description = "Set the output location for the generated files"
+}
 
 if os.is ("macosx") then
     osname = "mac"
@@ -62,15 +105,15 @@ else
     osname = os.get()
 end
 
-destination = "./" .. osname .. "/" .. _ACTION
+destination = _OPTIONS["to"] or "./" .. osname .. "/" .. _ACTION
 copybase = path.rebase ("..", os.getcwd (), os.getcwd () .. "/" .. destination)
 
 
 --
--- Solution: OrxTemplate
+-- Solution: orx
 --
 
-solution "OrxTemplate"
+solution "Game"
 
     language ("C++")
 
@@ -91,22 +134,39 @@ solution "OrxTemplate"
     includedirs
     {
         "../include",
-        "../include/orx"
+        "../include/orx",
+        "../../orx/code/include/",
+        "$(ORX)/include"
     }
+
+    configuration {"not macosx"}
+        libdirs {"../lib"}
+    configuration {}
+
+    libdirs
+    {
+        "../lib/dynamic",
+        "../../orx/code/lib/dynamic",
+        "$(ORX)/lib/dynamic"
+    }
+
+    targetdir ("../bin")
 
     flags
     {
         "NoPCH",
         "NoManifest",
-        "EnableSSE2",
         "FloatFast",
         "NoNativeWChar",
         "NoExceptions",
+        "NoIncrementalLink",
+        "NoEditAndContinue",
+        "NoMinimalRebuild",
         "Symbols",
         "StaticRuntime"
     }
 
-    configuration {"not vs2013"}
+    configuration {"not vs2013", "not vs2015"}
         flags {"EnableSSE2"}
 
     configuration {"not x64"}
@@ -118,13 +178,11 @@ solution "OrxTemplate"
     configuration {"*Debug*"}
         defines {"__orxDEBUG__"}
         links {"orxd"}
-        targetsuffix ("d")
 
     configuration {"*Profile*"}
         defines {"__orxPROFILER__"}
         flags {"Optimize", "NoRTTI"}
         links {"orxp"}
-        targetsuffix ("p")
 
     configuration {"*Release*"}
         flags {"Optimize", "NoRTTI"}
@@ -132,6 +190,15 @@ solution "OrxTemplate"
 
 
 -- Linux
+
+    configuration {"linux"}
+        linkoptions {"-Wl,-rpath ./", "-Wl,--export-dynamic"}
+        links
+        {
+            "dl",
+            "m",
+            "rt"
+        }
 
     -- This prevents an optimization bug from happening with some versions of gcc on linux
     configuration {"linux", "not *Debug*"}
@@ -143,14 +210,17 @@ solution "OrxTemplate"
     configuration {"macosx"}
         buildoptions
         {
-            "-isysroot /Developer/SDKs/MacOSX10.6.sdk",
             "-mmacosx-version-min=10.6",
             "-gdwarf-2",
             "-Wno-write-strings"
         }
+        links
+        {
+            "Foundation.framework",
+            "AppKit.framework"
+        }
         linkoptions
         {
-            "-isysroot /Developer/SDKs/MacOSX10.6.sdk",
             "-mmacosx-version-min=10.6",
             "-dead_strip"
         }
@@ -166,65 +236,37 @@ solution "OrxTemplate"
 
 
 --
--- Project: OrxTemplate
+-- Project: Game
 --
 
-project "OrxTemplate"
+project "Game"
 
     files
     {
-        "../src/**.c",
-        "../src/**.cpp",
-        "../include/**.h",
-        "../include/**.hpp"
+      "../src/**.c",
+      "../src/**.cpp",
+      "../src/**.inl",
+      "../include/**.h",
+      "../include/**.hpp"
     }
-    targetname ("OrxTemplate")
-
 
 -- Linux
 
     configuration {"linux"}
-        linkoptions {"-Wl,-rpath ./", "-Wl,--export-dynamic"}
-        links
-        {
-            "dl",
-            "m",
-            "rt"
-        }
-
-    configuration {"linux", "x32"}
-        libdirs {"../lib/linux32"}
-        targetdir ("../bin/linux32")
-
-    configuration {"linux", "x64"}
-        libdirs {"../lib/linux64"}
-        targetdir ("../bin/linux64")
+        postbuildcommands {"$(shell cp -f " .. copybase .. "/../code/lib/dynamic/liborx*.so " .. copybase .. "/bin)"}
 
 
 -- Mac OS X
 
-    configuration {"macosx"}
-        links
-        {
-            "Foundation.framework",
-            "AppKit.framework"
-        }
-        libdirs {"../lib/mac"}
-        targetdir ("../bin/mac")
+    configuration {"macosx", "xcode*"}
+        postbuildcommands {"$(cp -f " .. copybase .. "/../code/lib/dynamic/liborx*.dylib " .. copybase .. "/bin)"}
+
+    configuration {"macosx", "not xcode*"}
+        postbuildcommands {"$(shell cp -f " .. copybase .. "/../code/lib/dynamic/liborx*.dylib " .. copybase .. "/bin)"}
 
 
 -- Windows
 
     configuration {"windows"}
-        links
-        {
-            "winmm"
-        }
+        postbuildcommands {"cmd /c copy /Y " .. path.translate(copybase, "\\") .. "\\..\\code\\lib\\dynamic\\orx*.dll " .. path.translate(copybase, "\\") .. "\\bin"}
 
-    configuration {"windows", "x64"}
-        libdirs {"../lib/windows/64"}
-        targetdir ("../bin/windows/64")
-
-    configuration {"windows", "not x64"}
-        libdirs {"../lib/windows/32"}
-        targetdir ("../bin/windows/32")

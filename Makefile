@@ -1,7 +1,8 @@
 sln:
-	cd build/ && premake4.exe --os=windows vs2015
+	cd build/ && ./premake4 #--os=windows vs2015
 
 build:
+	$(MAKE) -d build/linux/gmake
 	MSBuild build/windows/vs2015/OrxTemplate.sln -p:Configuration=Debug -p:Platform=x64
 
 clean:
