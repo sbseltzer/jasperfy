@@ -7,6 +7,20 @@
 
 //! Code
 
+orxSTATUS orxFASTCALL Bootstrap()
+{
+  orxSTATUS eResult = orxSTATUS_SUCCESS;
+
+  // Adds default release config paths or do other stuffs
+  orxResource_AddStorage(orxCONFIG_KZ_RESOURCE_GROUP, "../../../", orxFALSE);
+
+  // Loads config file
+  orxConfig_Load("Game.ini");
+
+  // Done!
+  return eResult;
+}
+
 orxSTATUS orxFASTCALL Init()
 {
   orxSTATUS eResult = orxSTATUS_SUCCESS;
@@ -78,6 +92,9 @@ void orxFASTCALL Exit()
 
 int main(int argc, char **argv)
 {
+
+  orxConfig_SetBootstrap(Bootstrap);
+
   // Executes orx
   orx_Execute(argc, argv, Init, Run, Exit);
 
@@ -92,6 +109,9 @@ int main(int argc, char **argv)
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+
+  orxConfig_SetBootstrap(Bootstrap);
+
   // Executes orx
   orx_WinExecute(Init, Run, Exit);
 
