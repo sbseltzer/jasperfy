@@ -19,3 +19,5 @@
 bin/**/*
 build/**/*
 !build/premake4.*
+include/orx/
+lib
