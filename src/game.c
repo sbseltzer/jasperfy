@@ -3,6 +3,7 @@
 
 
 //! Variables
+orxOBJECT* objPlayer;
 
 
 //! Code
@@ -31,6 +32,8 @@ orxSTATUS orxFASTCALL Init()
   // Creates scene
   orxObject_CreateFromConfig("Scene");
 
+  // Create player
+  objPlayer = orxObject_CreateFromConfig("Player");
   // Done!
   return eResult;
 }
