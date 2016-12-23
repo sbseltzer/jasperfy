@@ -135,8 +135,8 @@ solution "Game"
     {
         "../include",
         "../include/orx",
-        "$(ORX)/include"
-        "../../orx/code/include/",
+        "$(ORX)/include",
+        "../../orx/code/include/"
     }
 
     configuration {"not macosx"}
@@ -146,8 +146,8 @@ solution "Game"
     libdirs
     {
         "../lib/dynamic",
-        "$(ORX)/lib/dynamic"
-        "../../orx/code/lib/dynamic",
+        "$(ORX)/lib/dynamic",
+        "../../orx/code/lib/dynamic"
     }
 
     targetdir ("../bin")
