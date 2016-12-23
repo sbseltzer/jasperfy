@@ -6,6 +6,7 @@
 orxOBJECT* objPlayer;
 orxVECTOR vLeftVelocity = {-20, 0, 0};
 orxVECTOR vRightVelocity = {20, 0, 0};
+orxVECTOR vJumpVelocity = {0, -600, 0};
 
 //! Code
 
@@ -53,6 +54,10 @@ orxSTATUS orxFASTCALL Run()
   if (orxInput_IsActive("MoveRight"))
   {
     orxObject_ApplyImpulse(objPlayer, &vRightVelocity, orxNULL);
+  }
+  if (orxInput_IsActive("Jump") && orxInput_HasNewStatus("Jump"))
+  {
+      orxObject_ApplyImpulse(objPlayer, &vJumpVelocity, orxNULL);
   }
   // Screenshot?
   if(orxInput_IsActive("Screenshot") && orxInput_HasNewStatus("Screenshot"))
