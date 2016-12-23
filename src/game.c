@@ -35,7 +35,7 @@ orxSTATUS orxFASTCALL Init()
   // Create player
   objPlayer = orxObject_CreateFromConfig("Player");
 
-  orxObject_CreateFromConfig("PlatformObject");
+  /* orxObject_CreateFromConfig("PlatformObject"); */
 
   // Done!
   return eResult;
