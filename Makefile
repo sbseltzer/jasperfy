@@ -1,11 +1,13 @@
-sln:
-	cd build/ && ./premake4 #--os=windows vs2015
+sbuild:
+	../orx/code/build/premake4 --file=build/premake4.lua
+
+sclean:
+	rm -rf build/windows
 
 build:
-	$(MAKE) -d build/linux/gmake
-	MSBuild build/windows/vs2015/OrxTemplate.sln -p:Configuration=Debug -p:Platform=x64
+	MSBuild build/windows/vs2015/Game.sln -p:Configuration=Debug -p:Platform=x64
 
 clean:
-	MSBuild build/windows/vs2015/OrxTemplate.sln -t:Clean
+	MSBuild build/windows/vs2015/Game.sln -t:Clean
 
-.PHONY: sln build clean
+.PHONY: sbuild sclean build clean

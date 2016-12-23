@@ -107,7 +107,7 @@ end
 
 destination = _OPTIONS["to"] or "./" .. osname .. "/" .. _ACTION
 copybase = path.rebase ("..", os.getcwd (), os.getcwd () .. "/" .. destination)
-
+print(destination, os.getcwd(), copybase)
 
 --
 -- Solution: orx
@@ -253,20 +253,20 @@ project "Game"
 -- Linux
 
     configuration {"linux"}
-        postbuildcommands {"$(shell cp -f " .. copybase .. "/../code/lib/dynamic/liborx*.so " .. copybase .. "/bin)"}
+    postbuildcommands {"$(shell cp -f " .. copybase .. "/../orx/code/lib/dynamic/liborx*.so " .. copybase .. "/bin)"}
 
 
 -- Mac OS X
 
     configuration {"macosx", "xcode*"}
-        postbuildcommands {"$(cp -f " .. copybase .. "/../code/lib/dynamic/liborx*.dylib " .. copybase .. "/bin)"}
+    postbuildcommands {"$(cp -f " .. copybase .. "/../orx/code/lib/dynamic/liborx*.dylib " .. copybase .. "/bin)"}
 
     configuration {"macosx", "not xcode*"}
-        postbuildcommands {"$(shell cp -f " .. copybase .. "/../code/lib/dynamic/liborx*.dylib " .. copybase .. "/bin)"}
+        postbuildcommands {"$(shell cp -f " .. copybase .. "/../orx/code/lib/dynamic/liborx*.dylib " .. copybase .. "/bin)"}
 
 
 -- Windows
 
     configuration {"windows"}
-        postbuildcommands {"cmd /c copy /Y " .. path.translate(copybase, "\\") .. "\\..\\code\\lib\\dynamic\\orx*.dll " .. path.translate(copybase, "\\") .. "\\bin"}
+        postbuildcommands {"cmd /c copy /Y " .. path.translate(copybase, "\\") .. "\\..\\orx\\code\\lib\\dynamic\\orx*.dll " .. path.translate(copybase, "\\") .. "\\bin"}
 
