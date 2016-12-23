@@ -3,10 +3,12 @@
 
 
 //! Variables
-orxOBJECT* objPlayer;
+orxOBJECT* oPlayer;
 orxVECTOR vLeftVelocity = {-20, 0, 0};
 orxVECTOR vRightVelocity = {20, 0, 0};
 orxVECTOR vJumpVelocity = {0, -600, 0};
+orxVECTOR vFlipLeft = { -2, 2, 1 };
+orxVECTOR vFlipRight = { 2, 2, 1 };
 
 //! Code
 
@@ -34,8 +36,8 @@ orxSTATUS orxFASTCALL Init()
   // Creates scene
   orxObject_CreateFromConfig("Scene");
 
-  // Create objPlayer
-  objPlayer = orxObject_CreateFromConfig("Player");
+  // Create oPlayer
+  oPlayer = orxObject_CreateFromConfig("Player");
 
   /* orxObject_CreateFromConfig("PlatformObject"); */
 
@@ -49,15 +51,24 @@ orxSTATUS orxFASTCALL Run()
 
   if (orxInput_IsActive("MoveLeft"))
   {
-    orxObject_ApplyImpulse(objPlayer, &vLeftVelocity, orxNULL);
+    orxObject_SetScale(oPlayer, &vFlipLeft);
+    orxObject_ApplyImpulse(oPlayer, &vLeftVelocity, orxNULL);
+    orxObject_SetTargetAnim(oPlayer, "SoldierRun");
   }
-  if (orxInput_IsActive("MoveRight"))
+  else if (orxInput_IsActive("MoveRight"))
   {
-    orxObject_ApplyImpulse(objPlayer, &vRightVelocity, orxNULL);
+    orxObject_SetScale(oPlayer, &vFlipRight);
+    orxObject_ApplyImpulse(oPlayer, &vRightVelocity, orxNULL);
+    orxObject_SetTargetAnim(oPlayer, "SoldierRun");
   }
+  else
+  {
+    orxObject_SetTargetAnim(oPlayer, orxNULL);
+  }
+
   if (orxInput_IsActive("Jump") && orxInput_HasNewStatus("Jump"))
   {
-      orxObject_ApplyImpulse(objPlayer, &vJumpVelocity, orxNULL);
+      orxObject_ApplyImpulse(oPlayer, &vJumpVelocity, orxNULL);
   }
   // Screenshot?
   if(orxInput_IsActive("Screenshot") && orxInput_HasNewStatus("Screenshot"))
