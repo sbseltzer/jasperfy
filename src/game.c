@@ -13,7 +13,7 @@ orxSTATUS orxFASTCALL Bootstrap()
   orxSTATUS eResult = orxSTATUS_SUCCESS;
 
   // Adds default release config paths or do other stuffs
-  orxResource_AddStorage(orxCONFIG_KZ_RESOURCE_GROUP, "../../../", orxFALSE);
+  orxResource_AddStorage(orxCONFIG_KZ_RESOURCE_GROUP, "../", orxFALSE);
 
   // Loads config file
   orxConfig_Load("Game.ini");
