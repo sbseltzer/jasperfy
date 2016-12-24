@@ -6,3 +6,5 @@ build/**/*
 !build/premake4.lua
 !build/README.md
 include/orx/
+screenshots/*
+!screenshots/README.md
