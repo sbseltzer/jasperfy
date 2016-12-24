@@ -4,6 +4,7 @@
 
 //! Variables
 orxOBJECT* oPlayer;
+orxOBJECT* oPlayerGun;
 orxVECTOR vLeftVelocity = {-20, 0, 0};
 orxVECTOR vRightVelocity = {20, 0, 0};
 orxVECTOR vJumpVelocity = {0, -600, 0};
@@ -36,10 +37,13 @@ orxSTATUS orxFASTCALL Init()
   // Creates scene
   orxObject_CreateFromConfig("Scene");
 
-  // Create oPlayer
+  // Create Player
   oPlayer = orxObject_CreateFromConfig("Player");
+ 
+  // Create PlayerGun
+  oPlayerGun = (orxOBJECT*)orxObject_GetChild(oPlayer);
 
-  /* orxObject_CreateFromConfig("PlatformObject"); */
+  orxObject_Enable(oPlayerGun, orxFALSE);
 
   // Done!
   return eResult;
