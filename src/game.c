@@ -69,10 +69,17 @@ orxSTATUS orxFASTCALL Run()
   {
     orxObject_SetTargetAnim(oPlayer, orxNULL);
   }
-
+  if (orxInput_IsActive("Shoot"))
+  {
+    orxObject_Enable(oPlayerGun, orxTRUE);
+  }
+  else
+  {
+    orxObject_Enable(oPlayerGun, orxFALSE);
+  }
   if (orxInput_IsActive("Jump") && orxInput_HasNewStatus("Jump"))
   {
-      orxObject_ApplyImpulse(oPlayer, &vJumpVelocity, orxNULL);
+    orxObject_ApplyImpulse(oPlayer, &vJumpVelocity, orxNULL);
   }
   // Screenshot?
   if(orxInput_IsActive("Screenshot") && orxInput_HasNewStatus("Screenshot"))
