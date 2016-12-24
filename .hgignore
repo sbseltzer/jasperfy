@@ -1,14 +1,8 @@
-syntax: glob
-**.obj
-**.ncb
-**.idb
-**.o
-**.ilk
-**.pdb
-**.htm
-**.log
-**.cih
-**.suo
-**.user
-**.sdf
-build/**/vs2013
+syntax: globbin/*
+!bin/*.ini
+lib
+!lib/README.md
+build/**/*
+!build/premake4.lua
+!build/README.md
+include/orx/

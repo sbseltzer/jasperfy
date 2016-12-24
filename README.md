@@ -4,6 +4,10 @@ This project is a template project that I'm developing as I follow the orx tutor
 
 # Usage
 
+## Notes on .gitignore and .hgignore
+
+I've set this project up to ignore premake-generated files in the `build` folder, non-config files in the `bin` folder, everything but the readme in the `lib` folder, and the `include/orx` folder.
+
 ## Project Setup
 
 ### Running Premake

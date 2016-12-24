@@ -1,23 +1,26 @@
-# bin/**/*.obj
-# bin/**/*.lib
-# bin/**/*.ncb
-# bin/**/*.idb
-# bin/**/*.o
-# bin/**/*.so
-# bin/**/*.dylib
-# bin/**/*.ilk
-# bin/**/*.pdb
-# bin/**/*.htm
-# bin/**/*.log
-# bin/**/*.cih
-# bin/**/*.sln
-# bin/**/*.vcxproj*
-# bin/**/*.suo
-# bin/**/*.user
-# bin/**/*.sdf
-# bin/**/*.exe
-bin/**/*
-build/**/*
-!build/premake4.*
-include/orx/
+bin/*
+!bin/*.ini
 lib
+!lib/README.md
+build/**/*
+!build/premake4.lua
+!build/README.md
+include/orx/
+# .obj
+# .lib
+# .ncb
+# .idb
+# .o
+# .so
+# .dylib
+# .ilk
+# .pdb
+# .htm
+# .log
+# .cih
+# .sln
+# .vcxproj*
+# .suo
+# .user
+# .sdf
+# .exe
