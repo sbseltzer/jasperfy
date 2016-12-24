@@ -19,8 +19,8 @@ orxSTATUS orxFASTCALL Bootstrap()
   // Adds default release config paths or do other stuffs
   orxResource_AddStorage(orxCONFIG_KZ_RESOURCE_GROUP, "../", orxFALSE);
 
-  // Loads config file
-  orxConfig_Load("Game.ini");
+  // Loads a specific config file
+  /* orxConfig_Load("SomeSpecificConfig.ini"); */
 
   // Done!
   return eResult;
