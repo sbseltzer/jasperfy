@@ -27,6 +27,30 @@ orxSTATUS orxFASTCALL Bootstrap()
   return eResult;
 }
 
+orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
+{
+  orxSTATUS eResult = orxSTATUS_SUCCESS;
+
+  if (_pstEvent->eID == orxPHYSICS_EVENT_CONTACT_ADD) {
+    orxOBJECT *pstRecipientObject, *pstSenderObject;
+
+    pstSenderObject = orxOBJECT(_pstEvent->hSender);
+    pstRecipientObject = orxOBJECT(_pstEvent->hRecipient);
+
+    orxSTRING senderObjectName = (orxSTRING)orxObject_GetName(pstSenderObject);
+    orxSTRING recipientObjectName = (orxSTRING)orxObject_GetName(pstRecipientObject);
+
+    if (orxString_Compare(senderObjectName, "StarObject") == 0) {
+      orxObject_SetLifeTime(pstSenderObject, 0);
+    }
+    if (orxString_Compare(recipientObjectName, "StarObject") == 0) {
+      orxObject_SetLifeTime(pstRecipientObject, 0);
+    }
+  }
+
+  return eResult;
+}
+
 orxSTATUS orxFASTCALL Init()
 {
   orxSTATUS eResult = orxSTATUS_SUCCESS;
@@ -43,7 +67,11 @@ orxSTATUS orxFASTCALL Init()
   // Create PlayerGun
   pstPlayerGun = (orxOBJECT*)orxObject_GetChild(pstPlayer);
 
+  // Disable gun object to keep it from spawning bullets
   orxObject_Enable(pstPlayerGun, orxFALSE);
+
+  // Add physics event handler
+  orxEvent_AddHandler(orxEVENT_TYPE_PHYSICS, PhysicsEventHandler);
 
   // Done!
   return eResult;
