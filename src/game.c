@@ -3,8 +3,8 @@
 
 
 //! Variables
-orxOBJECT* oPlayer;
-orxOBJECT* oPlayerGun;
+orxOBJECT* pstPlayer;
+orxOBJECT* pstPlayerGun;
 orxVECTOR vLeftVelocity = {-20, 0, 0};
 orxVECTOR vRightVelocity = {20, 0, 0};
 orxVECTOR vJumpVelocity = {0, -600, 0};
@@ -38,12 +38,12 @@ orxSTATUS orxFASTCALL Init()
   orxObject_CreateFromConfig("Scene");
 
   // Create Player
-  oPlayer = orxObject_CreateFromConfig("Player");
+  pstPlayer = orxObject_CreateFromConfig("Player");
  
   // Create PlayerGun
-  oPlayerGun = (orxOBJECT*)orxObject_GetChild(oPlayer);
+  pstPlayerGun = (orxOBJECT*)orxObject_GetChild(pstPlayer);
 
-  orxObject_Enable(oPlayerGun, orxFALSE);
+  orxObject_Enable(pstPlayerGun, orxFALSE);
 
   // Done!
   return eResult;
@@ -55,31 +55,31 @@ orxSTATUS orxFASTCALL Run()
 
   if (orxInput_IsActive("MoveLeft"))
   {
-    orxObject_SetScale(oPlayer, &vFlipLeft);
-    orxObject_ApplyImpulse(oPlayer, &vLeftVelocity, orxNULL);
-    orxObject_SetTargetAnim(oPlayer, "SoldierRun");
+    orxObject_SetScale(pstPlayer, &vFlipLeft);
+    orxObject_ApplyImpulse(pstPlayer, &vLeftVelocity, orxNULL);
+    orxObject_SetTargetAnim(pstPlayer, "SoldierRun");
   }
   else if (orxInput_IsActive("MoveRight"))
   {
-    orxObject_SetScale(oPlayer, &vFlipRight);
-    orxObject_ApplyImpulse(oPlayer, &vRightVelocity, orxNULL);
-    orxObject_SetTargetAnim(oPlayer, "SoldierRun");
+    orxObject_SetScale(pstPlayer, &vFlipRight);
+    orxObject_ApplyImpulse(pstPlayer, &vRightVelocity, orxNULL);
+    orxObject_SetTargetAnim(pstPlayer, "SoldierRun");
   }
   else
   {
-    orxObject_SetTargetAnim(oPlayer, orxNULL);
+    orxObject_SetTargetAnim(pstPlayer, orxNULL);
   }
   if (orxInput_IsActive("Shoot"))
   {
-    orxObject_Enable(oPlayerGun, orxTRUE);
+    orxObject_Enable(pstPlayerGun, orxTRUE);
   }
   else
   {
-    orxObject_Enable(oPlayerGun, orxFALSE);
+    orxObject_Enable(pstPlayerGun, orxFALSE);
   }
   if (orxInput_IsActive("Jump") && orxInput_HasNewStatus("Jump"))
   {
-    orxObject_ApplyImpulse(oPlayer, &vJumpVelocity, orxNULL);
+    orxObject_ApplyImpulse(pstPlayer, &vJumpVelocity, orxNULL);
   }
   // Screenshot?
   if(orxInput_IsActive("Screenshot") && orxInput_HasNewStatus("Screenshot"))
