@@ -4,6 +4,12 @@ This project is a template project that I'm developing as I follow the orx tutor
 
 # Usage
 
+## File Locations
+
+Each directory contains, at the very least, a README.md file to explain its purpose and how/when to use it. 
+
+I use orx's bootstrap registration to set a custom default path for config files. I prefer keeping versioned game content outside of the bin folder, which means keeping config files outside the bin folder. This is why `Game.ini` is in the base directory of this project. You can, of course, move it to the bin directory and it will still work.
+
 ## Notes on .gitignore and .hgignore
 
 I've set this project up to ignore premake-generated files in the `build` folder, non-config files in the `bin` folder, everything but the readme in the `lib` folder, and the `include/orx` folder.
