@@ -1,6 +1,6 @@
 # Orx Template Project
 
-This project is a template project that I'm developing as I follow the orx tutorial series and reflects my development preferences.
+This project is a template project that I'm developing as I follow the orx tutorial series and reflects an evolution of my development preferences. Perhaps you'll like it and perhaps adapt it to your own preferences.
 
 # Usage
 
