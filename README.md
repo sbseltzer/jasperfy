@@ -8,7 +8,7 @@ Each directory contains, at the very least, a `README.md` file to explain its pu
 
 ## File Locations
 
-I use orx's bootstrap registration to set a custom default path for config files. I prefer keeping versioned game content outside of the bin folder, which means keeping config files outside the bin folder. This is why `Game.ini` is in the base directory of this project. You can, of course, move it to the bin directory and it will still work.
+I use orx's bootstrap registration to set a custom default path for config files. I prefer keeping versioned game content outside of the bin folder, which means keeping config files outside the bin folder. By default the built executable name is `Game.exe`. That's why there's a `Game.ini` in the base directory of this project. You can, of course, move it to the bin directory and it will still work. At the time of writing this, if a `Game.ini` exists in both the root directory and the bin folder, the one in the bin folder will be chosen.
 
 ## Notes on .gitignore and .hgignore
 
