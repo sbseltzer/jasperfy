@@ -1,12 +1,12 @@
 # Orx Template Project
 
-This project is a template project that I'm developing as I follow the orx tutorial series and reflects an evolution of my development preferences. Perhaps you'll like it and perhaps adapt it to your own preferences.
+This project is a template that I'm developing as I follow the orx tutorial series. It reflects an evolution of my development preferences. Perhaps you'll like it and adapt it to your own needs. If you think there's a way to improve this template don't hesitate to add an issue for it or submit a pull request! My goal is to make this flexible and easy to adapt.
 
 # Usage
 
-## File Locations
+Each directory contains, at the very least, a `README.md` file to explain its purpose.
 
-Each directory contains, at the very least, a README.md file to explain its purpose and how/when to use it. 
+## File Locations
 
 I use orx's bootstrap registration to set a custom default path for config files. I prefer keeping versioned game content outside of the bin folder, which means keeping config files outside the bin folder. This is why `Game.ini` is in the base directory of this project. You can, of course, move it to the bin directory and it will still work.
 
