@@ -6,13 +6,15 @@ This project is a template that I'm developing as I follow the orx tutorial seri
 
 Each directory contains, at the very least, a `README.md` file to explain its purpose and any important details to be aware of.
 
-## File Locations
+Clone or download this project and use it as a template for your game. There are some project configuration options in `build/project.lua`. This project provides `src/game.c` and `include/game.h` as starting points for editing code. You can always discard these and use your own if you like. Continue reading for more details on the implications of changing these.
 
-I use orx's bootstrap registration to add the base directory of this project as a default search path for config files. I do this because I prefer keeping versioned game content (such as config files) outside of the bin folder. By default the built executable name is `Game.exe`, hence the `Game.ini` in the base directory of this project. 
+## File Names/Locations
 
-If you don't like your executable/config file to be named `Game`, simply edit the `build/project.lua` file. It's as easy as editing a variable.
+The `src/game.c` file uses orx's bootstrap registration to add the base directory of this project as a default search path for config files. I prefer keeping versioned game content (such as config files) outside of the folder, but you're welcome to do otherwise. By default the built executable name is `Game.exe`, hence the `Game.ini` in the base directory of this project. 
 
-You can also move the `.ini` file to the bin directory and it will still work. At the time of writing this, if a matching `.ini` exists in both the base directory and next to the executable, the one next to the executable will be chosen.
+You can move the `.ini` file to the `bin` directory and it will still work. At the time of writing this, if a matching `.ini` exists in both the base directory and next to the executable, the one next to the executable will be chosen.
+
+You can also modify the name of your executable/config file to be named something other than `Game`. Simply edit the `build/project.lua` file. It's as easy as editing a variable.
 
 ## Notes on .gitignore and .hgignore
 
