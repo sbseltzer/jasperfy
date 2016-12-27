@@ -1,8 +1,8 @@
 # Build
 
-Project build directory. This is where the `premake4.lua` file and generated project setups reside. You'll need orx's version of `premake.exe` in order to run it. If you clone the official orx repository, it comes with the executable. It can be found in the `extern` folder after you've run the setup script.
+Project build directory. This is where the `premake4.lua` file and generated project setups reside. You'll need orx's version of `premake4.exe` in order to run it. If you clone the official orx repository, it comes with the executable. It can be found in the `extern` folder after you've run the setup script.
 
-By default it makes quite a few assumptions about project configuration (such as language, paths, output names, etc.), but I've added a file named `project.lua` that contains some variables to these things are easier to configure. They are documented in comments.
+By default it makes quite a few assumptions about project configuration (such as language, paths, output names, etc.). To make changing these things easier, I've added a file named `project.lua` that can be modified instead of `premake4.lua`. These variables are documented in comments.
 
 ### IMPORTANT 
 
