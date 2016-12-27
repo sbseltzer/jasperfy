@@ -6,6 +6,16 @@
 -- Globals
 --
 
+-- This is where I define all of the convenience template project configuration.
+local templateVars = {
+  projectname = "Game", -- Output Project/Solution file name
+  execname = "Game", -- Compiled executable name
+  targetdir = "bin", -- Executable output folder (starting from base project directory)
+  libdir = "lib", -- Compile-time libary directory name (starting from base project directory)
+  language = "C", -- Project language
+  console = true -- Whether to attach a console window (Not important on Linux)
+}
+
 function islinux64 ()
     local pipe    = io.popen ("uname -m")
     local content = pipe:read ('*a')
@@ -110,16 +120,16 @@ copybase = path.rebase ("..", os.getcwd (), os.getcwd () .. "/" .. destination)
 print(destination, os.getcwd(), copybase)
 
 --
--- Solution: orx
+-- Solution
 --
 
-solution "Game"
+solution (templateVars.projectname)
 
-    language ("C++")
+    language (templateVars.language)
 
     location (destination)
 
-    kind ("ConsoleApp")
+    kind (templateVars.console and "ConsoleApp" or "WindowedApp")
 
     configurations
     {
@@ -150,7 +160,7 @@ solution "Game"
         "../../orx/code/lib/dynamic"
     }
 
-    targetdir ("../bin")
+    targetdir ("../" .. templateVars.targetdir)
 
     flags
     {
@@ -236,10 +246,10 @@ solution "Game"
 
 
 --
--- Project: Game
+-- Project
 --
 
-project "Game"
+project (templateVars.projectname)
 
     files
     {
@@ -250,23 +260,27 @@ project "Game"
       "../include/**.hpp"
     }
 
+    -- Make some variables for convenience.
+    local libDir = copybase .. "/../orx/code/lib/dynamic"
+    local binDir = copybase .. "/" .. templateVars.targetdir
+
 -- Linux
 
     configuration {"linux"}
-    postbuildcommands {"$(shell cp -f " .. copybase .. "/../orx/code/lib/dynamic/liborx*.so " .. copybase .. "/bin)"}
+    postbuildcommands {"$(shell cp -f " .. libDir .. "/liborx*.so " .. binDir .. ")"}
 
 
 -- Mac OS X
 
     configuration {"macosx", "xcode*"}
-    postbuildcommands {"$(cp -f " .. copybase .. "/../orx/code/lib/dynamic/liborx*.dylib " .. copybase .. "/bin)"}
+    postbuildcommands {"$(cp -f " .. libDir .. "/liborx*.dylib " .. binDir .. ")"}
 
     configuration {"macosx", "not xcode*"}
-        postbuildcommands {"$(shell cp -f " .. copybase .. "/../orx/code/lib/dynamic/liborx*.dylib " .. copybase .. "/bin)"}
+        postbuildcommands {"$(shell cp -f " .. libDir .. "/liborx*.dylib " .. binDir .. ")"}
 
 
 -- Windows
 
     configuration {"windows"}
-        postbuildcommands {"cmd /c copy /Y " .. path.translate(copybase, "\\") .. "\\..\\orx\\code\\lib\\dynamic\\orx*.dll " .. path.translate(copybase, "\\") .. "\\bin"}
+        postbuildcommands {"cmd /c copy /Y " .. path.translate(libDir, "\\") .. "\\orx*.dll " .. path.translate(binDir, "\\")}
 
