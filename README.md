@@ -33,7 +33,7 @@ Ensure orx's libaries and includes can be found during compilation.
 There are 3 ways to tell this project how to find the orx libraries/includes. You only need to do one of these.
 
 1. Download or clone orx's source code repository and place it as a sibling directory to this one. Ensure that `../orx/code/` is a valid path from this template project folder. Make sure you build the libraries so that the `../orx/code/lib` directory has content.
-2. Put things wherever you want and define an environment variable called `ORX` that points to a folder that contains `include/` and `lib/`. In this case it's feasible to download prebuilts. If you use bash it may look something like `export ORX=c:/custom/path/to/orx/code` or `export ORX=../my_orx_prebuilts/orx-nightly-2016-12-21/dev-vs2015-64`.
+2. Put things wherever you want and define an environment variable called `ORX` that points to a folder that contains `include/` and `lib/`. This path is relative to the `build` folder. In this case it's feasible to download prebuilts. If you use bash it may look something like `export ORX=c:/custom/path/to/orx/code` or `export ORX=../../my_orx_prebuilts/orx-nightly-2016-12-21/dev-vs2015-64`.
 3. Manually copy and paste the relevant orx libraries to this project's `lib` folder, and copy the contents of orx's includes folder to this project's `include/orx` folder. As before, this could be from a prebuilt download if you so desire.
 
 ## Compiling
