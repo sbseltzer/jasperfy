@@ -10,7 +10,7 @@ Each directory contains, at the very least, a `README.md` file to explain its pu
 
 I use orx's bootstrap registration to add the base directory of this project as a default search path for config files. I do this because I prefer keeping versioned game content (such as config files) outside of the bin folder. By default the built executable name is `Game.exe`, hence the `Game.ini` in the base directory of this project. 
 
-If you don't like your executable/config file to be named `Game`, simply edit the `build/premake4.lua` file. It's as easy as editing a variable at the top of the file.
+If you don't like your executable/config file to be named `Game`, simply edit the `build/project.lua` file. It's as easy as editing a variable.
 
 You can also move the `.ini` file to the bin directory and it will still work. At the time of writing this, if a matching `.ini` exists in both the base directory and next to the executable, the one next to the executable will be chosen.
 
