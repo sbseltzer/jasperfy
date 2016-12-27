@@ -155,9 +155,11 @@ solution (templateVars.projectname)
 
     libdirs
     {
-        "../lib/dynamic",
-        "$(ORX)/lib/dynamic",
-        "../../orx/code/lib/dynamic"
+      "../lib",
+      "../lib/dynamic",
+      "$(ORX)/lib",
+      "$(ORX)/lib/dynamic",
+      "../../orx/code/lib/dynamic"
     }
 
     targetdir ("../" .. templateVars.targetdir)
