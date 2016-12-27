@@ -46,5 +46,4 @@ Since I mostly use bash and plaintext editors for development, I use the premake
 
 The Makefile you see only exists to add commands that streamline that process on Windows. You're welcome to use whatever you like. 
 
-If you want to use that Makefile, you'll need to modify your environment and install some programs. On Windows I use Git Bash for scripting and Visual Studio 2015 for its compiler. This Makefile assumes you are using a Visual Studio 2015 project config and have Git Bash, GNU Make, and MSBuild in your path.
-
+If you want to use that Makefile, you'll need to modify your environment and install some programs. On Windows I use Git Bash for scripting and Visual Studio 2015 for its compiler. This Makefile assumes you are using a Visual Studio 2015 project config and have Git Bash, GNU Make, and MSBuild in your path. It also assumes the project name is `Game`. If you modify the premake file to change that name, you'll also need to modify the Makefile before you can use it.
