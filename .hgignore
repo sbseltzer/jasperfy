@@ -3,7 +3,7 @@ syntax: globbin/*
 lib
 !lib/README.md
 build/**/*
-!build/premake4.lua
+!build/*.lua
 !build/README.md
 include/orx/
 screenshots/*
