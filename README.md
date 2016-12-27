@@ -28,7 +28,7 @@ It uses a premake file that can be reconfigured relatively easily.
 
 ### Orx Libraries/Includes
 
-Ensure orx's libaries and includes can be found during compilation.
+First ensure orx's libraries and includes can be found during compilation.
 
 There are 3 ways to tell this project how to find the orx libraries/includes. You only need to do one of these.
 
