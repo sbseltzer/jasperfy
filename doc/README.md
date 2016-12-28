@@ -4,4 +4,6 @@ Doxygen is an excellent tool for making your in-code documentation more accessib
 
 This folder houses all Doxygen-related content. Generated Doxygen output is placed as subfolders of this one.
 
-It will ignore the contents of the `include/orx` folder and this `README.md` file. You can add extra documentation pages by making extra markdown files in this folder. You can edit the `Doxygen` file if you'd like it to search elsewhere.
+It will only look for documentation in the `include` folder (excluding `include/orx`), the `src` folder, and the `doc/pages` folder. You can edit the `Doxygen` file if you'd like it to search elsewhere. 
+
+All files named `README.md` are ignored by Doxygen by default.
