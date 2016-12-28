@@ -9,6 +9,19 @@ orxVECTOR vFlipLeft = { -2, 2, 1 };
 orxVECTOR vFlipRight = { 2, 2, 1 };
 
 //! Code
+void CreateExplosionAtObject(orxOBJECT *object, orxSTRING exploderObjectName)
+{
+  if (object == orxNULL)
+    return;
+ 
+  orxVECTOR objectVector;
+  orxObject_GetWorldPosition(object, &objectVector);
+  objectVector.fZ = 0.0;
+ 
+  orxOBJECT *explosion = orxObject_CreateFromConfig(exploderObjectName);
+ 
+  orxObject_SetPosition(explosion, &objectVector);
+}
 
 orxSTATUS orxFASTCALL Bootstrap()
 {
@@ -43,10 +56,23 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
     if (orxString_Compare(recipientObjectName, "StarObject") == 0) {
       orxObject_SetLifeTime(pstRecipientObject, 0);
     }
+
+    if (orxString_Compare(senderObjectName, "BulletObject") == 0){
+      CreateExplosionAtObject(pstRecipientObject, "JellyExploder");
+      orxObject_SetLifeTime(pstSenderObject, 0.1);
+      orxObject_SetLifeTime(pstRecipientObject, 0.1);
+    }
+
+    if (orxString_Compare(recipientObjectName, "BulletObject") == 0){
+      CreateExplosionAtObject(pstSenderObject, "JellyExploder");
+      orxObject_SetLifeTime(pstSenderObject, 0.1);
+      orxObject_SetLifeTime(pstRecipientObject, 0.1);
+    }
   }
 
   return eResult;
 }
+
 void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pstContext)
 {
   orxFLOAT fPlayerSpeed = 600;
