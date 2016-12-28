@@ -1,8 +1,9 @@
 bin/*
 !bin/*.ini
-lib
+!bin/README.md
+lib/*
 !lib/README.md
-build/**/*
+build/*
 !build/*.lua
 !build/README.md
 include/orx/
@@ -10,21 +11,3 @@ screenshots/*
 !screenshots/README.md
 doc/*/
 !doc/pages/
-# .obj
-# .lib
-# .ncb
-# .idb
-# .o
-# .so
-# .dylib
-# .ilk
-# .pdb
-# .htm
-# .log
-# .cih
-# .sln
-# .vcxproj*
-# .suo
-# .user
-# .sdf
-# .exe

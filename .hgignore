@@ -1,8 +1,10 @@
 syntax: globbin/*
+bin/*
 !bin/*.ini
-lib
+!bin/README.md
+lib/*
 !lib/README.md
-build/**/*
+build/*
 !build/*.lua
 !build/README.md
 include/orx/
@@ -10,3 +12,4 @@ screenshots/*
 !screenshots/README.md
 doc/*/
 !doc/pages/
+
