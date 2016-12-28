@@ -20,7 +20,7 @@ You can also modify the name of your executable/config file to be named somethin
 
 ## Notes on .gitignore and .hgignore
 
-I've set this repository up to ignore the contents of the `dox`/`screenshots` folders, premake-generated files in the `build` folder, non-config files in the `bin` folder, everything but the readme in the `lib` folder, and the `include/orx` folder.
+I've set this repository up to ignore the contents of the `lib`/`dox`/`screenshots` folders, non-lua files in the `build` folder, non-config files in the `bin` folder, and the `include/orx` folder.
 
 ## Project Setup
 
