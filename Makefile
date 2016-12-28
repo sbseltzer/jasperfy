@@ -2,7 +2,7 @@ sbuild:
 	../orx/code/build/premake4 --file=build/premake4.lua
 
 sclean:
-	rm -rf build/windows
+	cd build; rm -rf windows
 
 build:
 ifeq ($(OS),Windows_NT)
