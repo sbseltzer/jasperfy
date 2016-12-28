@@ -8,7 +8,8 @@ build/**/*
 include/orx/
 screenshots/*
 !screenshots/README.md
-dox
+doc/*/
+!doc/pages/
 # .obj
 # .lib
 # .ncb
