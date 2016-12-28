@@ -8,4 +8,4 @@ build/**/*
 include/orx/
 screenshots/*
 !screenshots/README.md
-dox
+doc/*/
