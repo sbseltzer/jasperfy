@@ -76,34 +76,34 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
 void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pstContext)
 {
   orxFLOAT fPlayerSpeed = 600;
-  orxVECTOR vLeftVelocity = {-fPlayerSpeed, 0, 0};
-  orxVECTOR vRightVelocity = {fPlayerSpeed, 0, 0};
-  orxVECTOR vJumpVelocity = {0, -600, 0};
+  orxVECTOR vWalkVelocity = {1, 0, 0};
+  orxVECTOR vJumpVelocity = {0, -1, 0};
+  orxVECTOR vMove;
 
-  /* orxConfig_GetVector("ScrollSpeed", &vLeftVelocity); */
+  orxObject_GetSpeed(pstPlayer, &vMove);
+  vMove.fX = 0;
+  /* orxVector_Copy(&vMove, &orxVECTOR_0); */
+  /* orxVector_Mulf(&vWalkVelocity, &vWalkVelocity, fPlayerSpeed); */
+  /* orxVector_Mulf(&vJumpVelocity, &vJumpVelocity, fPlayerSpeed); */
 
-  /* Pops config section */
-  /* orxConfig_PopSection(); */
-
-  orxVector_Mulf(&vLeftVelocity, &vLeftVelocity, _pstClockInfo->fDT);
-  orxVector_Mulf(&vRightVelocity, &vRightVelocity, _pstClockInfo->fDT);
-
+  if (orxInput_IsActive("MoveRight"))
+    {
+      orxObject_SetScale(pstPlayer, &vFlipRight);
+      orxObject_SetTargetAnim(pstPlayer, "SoldierRun");
+      vMove.fX += fPlayerSpeed;
+    }
   if (orxInput_IsActive("MoveLeft"))
     {
       orxObject_SetScale(pstPlayer, &vFlipLeft);
-      orxObject_ApplyImpulse(pstPlayer, &vLeftVelocity, orxNULL);
       orxObject_SetTargetAnim(pstPlayer, "SoldierRun");
+      /* orxVector_Neg(&vWalkVelocity, &vWalkVelocity); */
+      vMove.fX -= fPlayerSpeed;
     }
-  else if (orxInput_IsActive("MoveRight"))
+  if (orxInput_IsActive("Jump") && orxInput_HasNewStatus("Jump"))
     {
-      orxObject_SetScale(pstPlayer, &vFlipRight);
-      orxObject_ApplyImpulse(pstPlayer, &vRightVelocity, orxNULL);
-      orxObject_SetTargetAnim(pstPlayer, "SoldierRun");
+      vMove.fY -= fPlayerSpeed * 2.5;
     }
-  else
-    {
-      orxObject_SetTargetAnim(pstPlayer, orxNULL);
-    }
+
   if (orxInput_IsActive("Shoot"))
     {
       orxObject_Enable(pstPlayerGun, orxTRUE);
@@ -112,9 +112,15 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pstContext)
     {
       orxObject_Enable(pstPlayerGun, orxFALSE);
     }
-  if (orxInput_IsActive("Jump") && orxInput_HasNewStatus("Jump"))
+
+  /* orxVector_Mulf(&vMove, &vMove, _pstClockInfo->fDT); */
+  orxObject_SetSpeed(pstPlayer, &vMove);
+
+  orxVECTOR vActualPlayerSpeed;
+  orxObject_GetSpeed(pstPlayer, &vActualPlayerSpeed);
+  if (orxVector_GetSquareSize(&vActualPlayerSpeed) > 0.05f)
     {
-      orxObject_ApplyImpulse(pstPlayer, &vJumpVelocity, orxNULL);
+      orxObject_SetTargetAnim(pstPlayer, orxNULL);
     }
 }
 
