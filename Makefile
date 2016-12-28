@@ -18,4 +18,7 @@ else
 	$(MAKE) --no-print-directory -C build/linux/gmake -f Game.make clean
 endif
 
-.PHONY: sbuild sclean build clean
+dox:
+	cd doc ; doxygen
+
+.PHONY: sbuild sclean build clean dox
