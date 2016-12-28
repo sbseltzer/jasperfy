@@ -10,7 +10,9 @@ Clone or download this project and use it as a template for your game. There are
 
 ## File Names/Locations
 
-The `src/game.c` file uses orx's bootstrap registration to add the base directory of this project as a default search path for config files. I prefer keeping versioned game content (such as config files) outside of the folder, but you're welcome to do otherwise. By default the built executable name is `Game.exe`, hence the `Game.ini` in the base directory of this project. 
+The `src/game.c` file uses orx's bootstrap registration to add the base directory of this project as a default search path for config files. I prefer keeping versioned game content (such as config files) outside of the `bin` folder, but you're welcome to do otherwise. 
+
+By default the built executable name is `Game.exe`, hence the `Game.ini` in the base directory of this project. 
 
 You can move the `.ini` file to the `bin` directory and it will still work. At the time of writing this, if a matching `.ini` exists in both the base directory and next to the executable, the one next to the executable will be chosen.
 
@@ -18,7 +20,7 @@ You can also modify the name of your executable/config file to be named somethin
 
 ## Notes on .gitignore and .hgignore
 
-I've set this project up to ignore the `dox` folder, premake-generated files in the `build` folder, non-config files in the `bin` folder, everything but the readme in the `lib` folder, and the `include/orx` folder.
+I've set this repository up to ignore the contents of the `dox`/`screenshots` folders, premake-generated files in the `build` folder, non-config files in the `bin` folder, everything but the readme in the `lib` folder, and the `include/orx` folder.
 
 ## Project Setup
 
