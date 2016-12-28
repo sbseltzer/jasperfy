@@ -1,6 +1,8 @@
 # Orx Template Project
 
-This project is a template that I'm developing as I follow the orx tutorial series. It reflects an evolution of my development preferences. Perhaps you'll like it and adapt it to your own needs. If you think there's a way to improve this template don't hesitate to add an issue for it or submit a pull request! My goal is to make this flexible and easy to adapt.
+This project is a template that I'm developing as I follow the orx tutorial series. Perhaps you'll like it and adapt it to your own needs. If you think there's a way to improve this template don't hesitate to add an issue for it or submit a pull request! My goal is to make this flexible and easy to adapt.
+
+I use the `template` branch for development and follow tutorials using the `tutorials` branch.
 
 # Usage
 
