@@ -1,3 +1,6 @@
+run:
+	cd bin ; ./Game
+
 sbuild:
 	../orx/code/build/premake4 --file=build/premake4.lua
 
