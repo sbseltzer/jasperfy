@@ -5,9 +5,6 @@
 //! Variables
 orxOBJECT* pstPlayer;
 orxOBJECT* pstPlayerGun;
-orxVECTOR vLeftVelocity = {-20, 0, 0};
-orxVECTOR vRightVelocity = {20, 0, 0};
-orxVECTOR vJumpVelocity = {0, -600, 0};
 orxVECTOR vFlipLeft = { -2, 2, 1 };
 orxVECTOR vFlipRight = { 2, 2, 1 };
 
@@ -50,12 +47,58 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
 
   return eResult;
 }
+void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pstContext)
+{
+  orxFLOAT fPlayerSpeed = 600;
+  orxVECTOR vLeftVelocity = {-fPlayerSpeed, 0, 0};
+  orxVECTOR vRightVelocity = {fPlayerSpeed, 0, 0};
+  orxVECTOR vJumpVelocity = {0, -600, 0};
+
+  /* orxConfig_GetVector("ScrollSpeed", &vLeftVelocity); */
+
+  /* Pops config section */
+  /* orxConfig_PopSection(); */
+
+  orxVector_Mulf(&vLeftVelocity, &vLeftVelocity, _pstClockInfo->fDT);
+  orxVector_Mulf(&vRightVelocity, &vRightVelocity, _pstClockInfo->fDT);
+
+  if (orxInput_IsActive("MoveLeft"))
+    {
+      orxObject_SetScale(pstPlayer, &vFlipLeft);
+      orxObject_ApplyImpulse(pstPlayer, &vLeftVelocity, orxNULL);
+      orxObject_SetTargetAnim(pstPlayer, "SoldierRun");
+    }
+  else if (orxInput_IsActive("MoveRight"))
+    {
+      orxObject_SetScale(pstPlayer, &vFlipRight);
+      orxObject_ApplyImpulse(pstPlayer, &vRightVelocity, orxNULL);
+      orxObject_SetTargetAnim(pstPlayer, "SoldierRun");
+    }
+  else
+    {
+      orxObject_SetTargetAnim(pstPlayer, orxNULL);
+    }
+  if (orxInput_IsActive("Shoot"))
+    {
+      orxObject_Enable(pstPlayerGun, orxTRUE);
+    }
+  else
+    {
+      orxObject_Enable(pstPlayerGun, orxFALSE);
+    }
+  if (orxInput_IsActive("Jump") && orxInput_HasNewStatus("Jump"))
+    {
+      orxObject_ApplyImpulse(pstPlayer, &vJumpVelocity, orxNULL);
+    }
+}
 
 orxSTATUS orxFASTCALL Init()
 {
   orxSTATUS eResult = orxSTATUS_SUCCESS;
 
-  // Creates viewport
+  orxCLOCK       *pstClock;
+  
+// Creates viewport
   orxViewport_CreateFromConfig("Viewport");
 
   // Creates scene
@@ -73,42 +116,20 @@ orxSTATUS orxFASTCALL Init()
   // Add physics event handler
   orxEvent_AddHandler(orxEVENT_TYPE_PHYSICS, PhysicsEventHandler);
 
+  pstClock = orxClock_FindFirst(orx2F(-1.0f), orxCLOCK_TYPE_CORE);
+ 
+  orxClock_Register(pstClock, Update, orxNULL, orxMODULE_ID_MAIN, orxCLOCK_PRIORITY_NORMAL);
+
   // Done!
   return eResult;
 }
+
+
 
 orxSTATUS orxFASTCALL Run()
 {
   orxSTATUS eResult = orxSTATUS_SUCCESS;
 
-  if (orxInput_IsActive("MoveLeft"))
-  {
-    orxObject_SetScale(pstPlayer, &vFlipLeft);
-    orxObject_ApplyImpulse(pstPlayer, &vLeftVelocity, orxNULL);
-    orxObject_SetTargetAnim(pstPlayer, "SoldierRun");
-  }
-  else if (orxInput_IsActive("MoveRight"))
-  {
-    orxObject_SetScale(pstPlayer, &vFlipRight);
-    orxObject_ApplyImpulse(pstPlayer, &vRightVelocity, orxNULL);
-    orxObject_SetTargetAnim(pstPlayer, "SoldierRun");
-  }
-  else
-  {
-    orxObject_SetTargetAnim(pstPlayer, orxNULL);
-  }
-  if (orxInput_IsActive("Shoot"))
-  {
-    orxObject_Enable(pstPlayerGun, orxTRUE);
-  }
-  else
-  {
-    orxObject_Enable(pstPlayerGun, orxFALSE);
-  }
-  if (orxInput_IsActive("Jump") && orxInput_HasNewStatus("Jump"))
-  {
-    orxObject_ApplyImpulse(pstPlayer, &vJumpVelocity, orxNULL);
-  }
   // Screenshot?
   if(orxInput_IsActive("Screenshot") && orxInput_HasNewStatus("Screenshot"))
   {
