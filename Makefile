@@ -24,4 +24,4 @@ endif
 dox:
 	cd doc ; doxygen
 
-.PHONY: sbuild sclean build clean dox
+.PHONY: run sbuild sclean build clean dox
