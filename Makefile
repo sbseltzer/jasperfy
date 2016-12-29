@@ -1,3 +1,6 @@
+encrypt:
+	../orx/tools/orxCrypt/bin/orxcrypt -f Game.ini
+
 run:
 	cd bin ; ./Game
 
@@ -24,7 +27,5 @@ endif
 dox:
 	cd doc ; doxygen
 
-encrypt:
-	../orx/tools/orxCrypt/bin/orxcrypt -f Game.ini
 
 .PHONY: run sbuild sclean build clean dox
