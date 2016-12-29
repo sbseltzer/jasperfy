@@ -86,42 +86,36 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pstContext)
   /* orxVector_Mulf(&vWalkVelocity, &vWalkVelocity, fPlayerSpeed); */
   /* orxVector_Mulf(&vJumpVelocity, &vJumpVelocity, fPlayerSpeed); */
 
-  if (orxInput_IsActive("MoveRight"))
-    {
-      orxObject_SetScale(pstPlayer, &vFlipRight);
-      orxObject_SetTargetAnim(pstPlayer, "SoldierRun");
-      vMove.fX += fPlayerSpeed;
-    }
-  if (orxInput_IsActive("MoveLeft"))
-    {
-      orxObject_SetScale(pstPlayer, &vFlipLeft);
-      orxObject_SetTargetAnim(pstPlayer, "SoldierRun");
-      /* orxVector_Neg(&vWalkVelocity, &vWalkVelocity); */
-      vMove.fX -= fPlayerSpeed;
-    }
-  if (orxInput_IsActive("Jump") && orxInput_HasNewStatus("Jump"))
-    {
-      vMove.fY -= fPlayerSpeed * 2.5;
-    }
+  if (orxInput_IsActive("MoveRight")) {
+    orxObject_SetScale(pstPlayer, &vFlipRight);
+    orxObject_SetTargetAnim(pstPlayer, "SoldierRun");
+    vMove.fX += fPlayerSpeed;
+  }
+  if (orxInput_IsActive("MoveLeft")) {
+    orxObject_SetScale(pstPlayer, &vFlipLeft);
+    orxObject_SetTargetAnim(pstPlayer, "SoldierRun");
+    /* orxVector_Neg(&vWalkVelocity, &vWalkVelocity); */
+    vMove.fX -= fPlayerSpeed;
+  }
+  if (orxInput_IsActive("Jump") && orxInput_HasNewStatus("Jump")) {
+    vMove.fY -= fPlayerSpeed * 2.5;
+  }
 
-  if (orxInput_IsActive("Shoot"))
-    {
-      orxObject_Enable(pstPlayerGun, orxTRUE);
-    }
-  else
-    {
-      orxObject_Enable(pstPlayerGun, orxFALSE);
-    }
+  if (orxInput_IsActive("Shoot")) {
+    orxObject_Enable(pstPlayerGun, orxTRUE);
+  }
+  else {
+    orxObject_Enable(pstPlayerGun, orxFALSE);
+  }
 
   /* orxVector_Mulf(&vMove, &vMove, _pstClockInfo->fDT); */
   orxObject_SetSpeed(pstPlayer, &vMove);
 
   orxVECTOR vActualPlayerSpeed;
   orxObject_GetSpeed(pstPlayer, &vActualPlayerSpeed);
-  if (orxVector_GetSquareSize(&vActualPlayerSpeed) > 0.05f)
-    {
-      orxObject_SetTargetAnim(pstPlayer, orxNULL);
-    }
+  if (orxVector_GetSquareSize(&vActualPlayerSpeed) > 0.05f) {
+    orxObject_SetTargetAnim(pstPlayer, orxNULL);
+  }
 }
 
 orxSTATUS orxFASTCALL Init()
@@ -129,8 +123,8 @@ orxSTATUS orxFASTCALL Init()
   orxSTATUS eResult = orxSTATUS_SUCCESS;
 
   orxCLOCK       *pstClock;
-  
-// Creates viewport
+
+  // Creates viewport
   orxViewport_CreateFromConfig("Viewport");
 
   // Creates scene
@@ -138,7 +132,7 @@ orxSTATUS orxFASTCALL Init()
 
   // Create Player
   pstPlayer = orxObject_CreateFromConfig("Player");
- 
+
   // Create PlayerGun
   pstPlayerGun = (orxOBJECT*)orxObject_GetChild(pstPlayer);
 
@@ -164,16 +158,16 @@ orxSTATUS orxFASTCALL Run()
 
   // Screenshot?
   if(orxInput_IsActive("Screenshot") && orxInput_HasNewStatus("Screenshot"))
-  {
-    // Captures it
-    orxScreenshot_Capture();
-  }
+    {
+      // Captures it
+      orxScreenshot_Capture();
+    }
   // Quitting?
   if(orxInput_IsActive("Quit"))
-  {
-    // Updates result
-    eResult = orxSTATUS_FAILURE;
-  }
+    {
+      // Updates result
+      eResult = orxSTATUS_FAILURE;
+    }
 
   // Done!
   return eResult;
