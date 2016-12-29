@@ -11,3 +11,4 @@ screenshots/*
 !screenshots/README.md
 doc/*/
 !doc/pages/
+dev.ini
