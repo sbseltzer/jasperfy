@@ -9,6 +9,7 @@ orxVECTOR vFlipLeft = { -2, 2, 1 };
 orxVECTOR vFlipRight = { 2, 2, 1 };
 orxOBJECT* pstScoreObject;
 orxS16 score = 0;
+orxOBJECT* pstScene;
 
 //! Code
 
@@ -93,6 +94,7 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
       CreateExplosionAtObject(pstRecipientObject, "PlayerExploder");
       orxObject_SetLifeTime(pstRecipientObject, 0);
       orxObject_Enable(pstRecipientObject, orxFALSE);
+      orxObject_AddTimeLineTrack(pstScene, "PopUpGameOverTrack");
     }
     if (orxString_Compare(senderObjectName, "PlayerObject") == 0 &&
         orxString_Compare(recipientObjectName, "MonsterObject") == 0) {
@@ -100,6 +102,7 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
       CreateExplosionAtObject(pstSenderObject, "PlayerExploder");
       orxObject_SetLifeTime(pstSenderObject, 0);
       orxObject_Enable(pstSenderObject, orxFALSE);
+      orxObject_AddTimeLineTrack(pstScene, "PopUpGameOverTrack");
     }
   }
 
@@ -158,8 +161,8 @@ orxSTATUS orxFASTCALL Init()
   // Creates viewport
   orxViewport_CreateFromConfig("Viewport");
 
-  // Creates scene
-  orxObject_CreateFromConfig("Scene");
+  // Creates pstScene
+  pstScene = orxObject_CreateFromConfig("Scene");
 
   // Create Player
   pstPlayer = orxObject_CreateFromConfig("PlayerObject");
