@@ -68,6 +68,19 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
       orxObject_SetLifeTime(pstSenderObject, 0.1);
       orxObject_SetLifeTime(pstRecipientObject, 0.1);
     }
+    if (orxString_Compare(recipientObjectName, "PlayerObject") == 0 &&
+        orxString_Compare(senderObjectName, "MonsterObject") == 0){
+      CreateExplosionAtObject(pstRecipientObject, "PlayerExploder");
+      orxObject_SetLifeTime(pstSenderObject, 0);
+      orxObject_Enable(pstRecipientObject, orxFALSE);
+    }
+ 
+    if (orxString_Compare(senderObjectName, "PlayerObject") == 0 &&
+        orxString_Compare(recipientObjectName, "MonsterObject") == 0){
+      CreateExplosionAtObject(pstSenderObject, "PlayerExploder");
+      orxObject_SetLifeTime(pstSenderObject, 0);
+      orxObject_Enable(pstSenderObject, orxFALSE);
+    }
   }
 
   return eResult;
