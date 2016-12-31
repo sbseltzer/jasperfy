@@ -72,14 +72,16 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
 
     if (orxString_Compare(recipientObjectName, "PlayerObject") == 0 &&
         orxString_Compare(senderObjectName, "MonsterObject") == 0) {
+      pstPlayer = orxNULL;
       CreateExplosionAtObject(pstRecipientObject, "PlayerExploder");
-      /* orxObject_SetLifeTime(pstRecipientObject, 0); */
+      orxObject_SetLifeTime(pstRecipientObject, 0);
       orxObject_Enable(pstRecipientObject, orxFALSE);
     }
     if (orxString_Compare(senderObjectName, "PlayerObject") == 0 &&
         orxString_Compare(recipientObjectName, "MonsterObject") == 0) {
+      pstPlayer = orxNULL;
       CreateExplosionAtObject(pstSenderObject, "PlayerExploder");
-      /* orxObject_SetLifeTime(pstSenderObject, 0); */
+      orxObject_SetLifeTime(pstSenderObject, 0);
       orxObject_Enable(pstSenderObject, orxFALSE);
     }
   }
@@ -93,6 +95,10 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pstContext)
   orxVECTOR vWalkVelocity = {1, 0, 0};
   orxVECTOR vJumpVelocity = {0, -1, 0};
   orxVECTOR vMove;
+
+  if (pstPlayer == orxNULL) {
+    return;
+  }
 
   orxObject_GetSpeed(pstPlayer, &vMove);
   vMove.fX = 0;
