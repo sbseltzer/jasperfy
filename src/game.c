@@ -7,8 +7,21 @@ orxOBJECT* pstPlayer;
 orxOBJECT* pstPlayerGun;
 orxVECTOR vFlipLeft = { -2, 2, 1 };
 orxVECTOR vFlipRight = { 2, 2, 1 };
+orxOBJECT* pstScoreObject;
+orxS16 score = 0;
 
 //! Code
+
+void AddScore(int increase)
+{
+  score += increase;
+
+  orxCHAR formattedScore[6];
+  orxString_Print(formattedScore, "%d", score);
+
+  orxObject_SetTextString(pstScoreObject, formattedScore);
+}
+
 void CreateExplosionAtObject(orxOBJECT *object, orxSTRING exploderObjectName)
 {
   orxLOG("explode %s", exploderObjectName);
@@ -54,20 +67,24 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
 
     if (orxString_Compare(senderObjectName, "StarObject") == 0) {
       orxObject_SetLifeTime(pstSenderObject, 0);
+      AddScore(1000);
     }
     if (orxString_Compare(recipientObjectName, "StarObject") == 0) {
       orxObject_SetLifeTime(pstRecipientObject, 0);
+      AddScore(1000);
     }
 
     if (orxString_Compare(senderObjectName, "BulletObject") == 0){
       CreateExplosionAtObject(pstRecipientObject, "JellyExploder");
       orxObject_SetLifeTime(pstSenderObject, 0.1);
       orxObject_SetLifeTime(pstRecipientObject, 0.1);
+      AddScore(250);
     }
     if (orxString_Compare(recipientObjectName, "BulletObject") == 0){
       CreateExplosionAtObject(pstSenderObject, "JellyExploder");
       orxObject_SetLifeTime(pstSenderObject, 0.1);
       orxObject_SetLifeTime(pstRecipientObject, 0.1);
+      AddScore(250);
     }
 
     if (orxString_Compare(recipientObjectName, "PlayerObject") == 0 &&
@@ -160,6 +177,7 @@ orxSTATUS orxFASTCALL Init()
  
   orxClock_Register(pstClock, Update, orxNULL, orxMODULE_ID_MAIN, orxCLOCK_PRIORITY_NORMAL);
 
+  pstScoreObject = orxObject_CreateFromConfig("ScoreObject");
   // Done!
   return eResult;
 }
