@@ -11,15 +11,17 @@ orxVECTOR vFlipRight = { 2, 2, 1 };
 //! Code
 void CreateExplosionAtObject(orxOBJECT *object, orxSTRING exploderObjectName)
 {
+  orxLOG("explode %s", exploderObjectName);
+
   if (object == orxNULL)
     return;
- 
+
   orxVECTOR objectVector;
   orxObject_GetWorldPosition(object, &objectVector);
   objectVector.fZ = 0.0;
- 
+
   orxOBJECT *explosion = orxObject_CreateFromConfig(exploderObjectName);
- 
+
   orxObject_SetPosition(explosion, &objectVector);
 }
 
@@ -62,23 +64,22 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
       orxObject_SetLifeTime(pstSenderObject, 0.1);
       orxObject_SetLifeTime(pstRecipientObject, 0.1);
     }
-
     if (orxString_Compare(recipientObjectName, "BulletObject") == 0){
       CreateExplosionAtObject(pstSenderObject, "JellyExploder");
       orxObject_SetLifeTime(pstSenderObject, 0.1);
       orxObject_SetLifeTime(pstRecipientObject, 0.1);
     }
+
     if (orxString_Compare(recipientObjectName, "PlayerObject") == 0 &&
-        orxString_Compare(senderObjectName, "MonsterObject") == 0){
+        orxString_Compare(senderObjectName, "MonsterObject") == 0) {
       CreateExplosionAtObject(pstRecipientObject, "PlayerExploder");
-      orxObject_SetLifeTime(pstSenderObject, 0);
+      /* orxObject_SetLifeTime(pstRecipientObject, 0); */
       orxObject_Enable(pstRecipientObject, orxFALSE);
     }
- 
     if (orxString_Compare(senderObjectName, "PlayerObject") == 0 &&
-        orxString_Compare(recipientObjectName, "MonsterObject") == 0){
+        orxString_Compare(recipientObjectName, "MonsterObject") == 0) {
       CreateExplosionAtObject(pstSenderObject, "PlayerExploder");
-      orxObject_SetLifeTime(pstSenderObject, 0);
+      /* orxObject_SetLifeTime(pstSenderObject, 0); */
       orxObject_Enable(pstSenderObject, orxFALSE);
     }
   }
@@ -111,7 +112,7 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pstContext)
     vMove.fX -= fPlayerSpeed;
   }
   if (orxInput_IsActive("Jump") && orxInput_HasNewStatus("Jump")) {
-    vMove.fY -= fPlayerSpeed * 2.5;
+    vMove.fY -= fPlayerSpeed * 2.5f;
   }
 
   if (orxInput_IsActive("Shoot")) {
@@ -121,14 +122,8 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pstContext)
     orxObject_Enable(pstPlayerGun, orxFALSE);
   }
 
-  /* orxVector_Mulf(&vMove, &vMove, _pstClockInfo->fDT); */
   orxObject_SetSpeed(pstPlayer, &vMove);
 
-  orxVECTOR vActualPlayerSpeed;
-  orxObject_GetSpeed(pstPlayer, &vActualPlayerSpeed);
-  if (orxVector_GetSquareSize(&vActualPlayerSpeed) > 0.05f) {
-    orxObject_SetTargetAnim(pstPlayer, orxNULL);
-  }
 }
 
 orxSTATUS orxFASTCALL Init()
@@ -144,7 +139,7 @@ orxSTATUS orxFASTCALL Init()
   orxObject_CreateFromConfig("Scene");
 
   // Create Player
-  pstPlayer = orxObject_CreateFromConfig("Player");
+  pstPlayer = orxObject_CreateFromConfig("PlayerObject");
 
   // Create PlayerGun
   pstPlayerGun = (orxOBJECT*)orxObject_GetChild(pstPlayer);
