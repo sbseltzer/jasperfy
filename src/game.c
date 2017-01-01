@@ -111,8 +111,6 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
 void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pstContext)
 {
   orxFLOAT fPlayerSpeed = 600;
-  orxVECTOR vWalkVelocity = {1, 0, 0};
-  orxVECTOR vJumpVelocity = {0, -1, 0};
   orxVECTOR vMove;
 
   if (pstPlayer == orxNULL) {
@@ -120,7 +118,7 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pstContext)
   }
 
   orxObject_GetSpeed(pstPlayer, &vMove);
-  vMove.fX = 0;
+  vMove.fX = 0.1f;
 
   if (orxInput_IsActive("MoveRight")) {
     orxObject_SetScale(pstPlayer, &vFlipRight);
