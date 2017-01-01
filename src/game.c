@@ -5,8 +5,6 @@
 //! Variables
 orxOBJECT* pstPlayer;
 orxOBJECT* pstPlayerGun;
-orxVECTOR vFlipLeft = { -2, 2, 1 };
-orxVECTOR vFlipRight = { 2, 2, 1 };
 orxOBJECT* pstScoreObject;
 orxS16 score = 0;
 orxOBJECT* pstScene;
@@ -121,12 +119,12 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pstContext)
   vMove.fX = 0.0f;
 
   if (orxInput_IsActive("MoveRight")) {
-    orxObject_SetScale(pstPlayer, &vFlipRight);
+    orxObject_SetFlip(pstPlayer, orxFALSE, orxFALSE);
     orxObject_SetTargetAnim(pstPlayer, "SoldierRun");
     vMove.fX += fPlayerSpeed;
   }
   if (orxInput_IsActive("MoveLeft")) {
-    orxObject_SetScale(pstPlayer, &vFlipLeft);
+    orxObject_SetFlip(pstPlayer, orxTRUE, orxFALSE);
     orxObject_SetTargetAnim(pstPlayer, "SoldierRun");
     vMove.fX -= fPlayerSpeed;
   }
