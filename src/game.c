@@ -39,6 +39,24 @@ void CreateExplosionAtObject(orxOBJECT *object, orxSTRING exploderObjectName)
   orxObject_SetPosition(explosion, &objectVector);
 }
 
+orxBOOL HaveCollided(orxOBJECT *pstSenderObject, orxOBJECT *pstRecipientObject, orxSTRING objectA, orxSTRING objectB, orxOBJECT **pstObjectA, orxOBJECT **pstObjectB)
+{
+  orxSTRING senderObjectName = (orxSTRING)orxObject_GetName(pstSenderObject);
+  orxSTRING recipientObjectName = (orxSTRING)orxObject_GetName(pstRecipientObject);
+  orxBOOL collided = orxFALSE;
+  if ((orxString_Compare(senderObjectName, objectA) == 0) && (orxString_Compare(recipientObjectName, objectB) == 0)) {
+      collided = orxTRUE;
+      *pstObjectA = pstSenderObject;
+      *pstObjectB = pstRecipientObject;
+    }
+  else if ((orxString_Compare(senderObjectName, objectB) == 0) && (orxString_Compare(recipientObjectName, objectA) == 0)) {
+      collided = orxTRUE;
+      *pstObjectB = pstSenderObject;
+      *pstObjectA = pstRecipientObject;
+    }
+  return collided;
+}
+
 orxSTATUS orxFASTCALL Bootstrap()
 {
   orxSTATUS eResult = orxSTATUS_SUCCESS;
@@ -58,7 +76,7 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
   orxSTATUS eResult = orxSTATUS_SUCCESS;
 
   if (_pstEvent->eID == orxPHYSICS_EVENT_CONTACT_ADD) {
-    orxOBJECT *pstRecipientObject, *pstSenderObject;
+    orxOBJECT *pstRecipientObject, *pstSenderObject, *pstObjectA, *pstObjectB;
 
     pstSenderObject = orxOBJECT(_pstEvent->hSender);
     pstRecipientObject = orxOBJECT(_pstEvent->hRecipient);
@@ -66,42 +84,23 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
     orxSTRING senderObjectName = (orxSTRING)orxObject_GetName(pstSenderObject);
     orxSTRING recipientObjectName = (orxSTRING)orxObject_GetName(pstRecipientObject);
 
-    if (orxString_Compare(senderObjectName, "StarObject") == 0) {
-      orxObject_SetLifeTime(pstSenderObject, 0);
-      AddScore(1000);
-    }
-    if (orxString_Compare(recipientObjectName, "StarObject") == 0) {
-      orxObject_SetLifeTime(pstRecipientObject, 0);
+    if (HaveCollided(pstSenderObject, pstRecipientObject, "StarObject", "PlayerObject", &pstObjectA, &pstObjectB)) {
+      orxObject_SetLifeTime(pstObjectA, 0);
       AddScore(1000);
     }
 
-    if (orxString_Compare(senderObjectName, "BulletObject") == 0){
-      CreateExplosionAtObject(pstRecipientObject, "JellyExploder");
-      orxObject_SetLifeTime(pstSenderObject, 0.1);
-      orxObject_SetLifeTime(pstRecipientObject, 0.1);
-      AddScore(250);
-    }
-    if (orxString_Compare(recipientObjectName, "BulletObject") == 0){
-      CreateExplosionAtObject(pstSenderObject, "JellyExploder");
-      orxObject_SetLifeTime(pstSenderObject, 0.1);
-      orxObject_SetLifeTime(pstRecipientObject, 0.1);
+    if (HaveCollided(pstSenderObject, pstRecipientObject, "BulletObject", "MonsterObject", &pstObjectA, &pstObjectB)) {
+      CreateExplosionAtObject(pstObjectA, "JellyExploder");
+      orxObject_SetLifeTime(pstObjectB, 0.1);
+      orxObject_SetLifeTime(pstObjectA, 0.1);
       AddScore(250);
     }
 
-    if (orxString_Compare(recipientObjectName, "PlayerObject") == 0 &&
-        orxString_Compare(senderObjectName, "MonsterObject") == 0) {
+    if (HaveCollided(pstSenderObject, pstRecipientObject, "PlayerObject", "MonsterObject", &pstObjectA, &pstObjectB)) {
       pstPlayer = orxNULL;
-      CreateExplosionAtObject(pstRecipientObject, "PlayerExploder");
-      orxObject_SetLifeTime(pstRecipientObject, 0);
-      orxObject_Enable(pstRecipientObject, orxFALSE);
-      orxObject_AddTimeLineTrack(pstScene, "PopUpGameOverTrack");
-    }
-    if (orxString_Compare(senderObjectName, "PlayerObject") == 0 &&
-        orxString_Compare(recipientObjectName, "MonsterObject") == 0) {
-      pstPlayer = orxNULL;
-      CreateExplosionAtObject(pstSenderObject, "PlayerExploder");
-      orxObject_SetLifeTime(pstSenderObject, 0);
-      orxObject_Enable(pstSenderObject, orxFALSE);
+      CreateExplosionAtObject(pstObjectA, "PlayerExploder");
+      orxObject_SetLifeTime(pstObjectA, 0);
+      orxObject_Enable(pstObjectA, orxFALSE);
       orxObject_AddTimeLineTrack(pstScene, "PopUpGameOverTrack");
     }
   }
