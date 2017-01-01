@@ -118,7 +118,7 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pstContext)
   }
 
   orxObject_GetSpeed(pstPlayer, &vMove);
-  vMove.fX = 0.1f;
+  vMove.fX = 0.0f;
 
   if (orxInput_IsActive("MoveRight")) {
     orxObject_SetScale(pstPlayer, &vFlipRight);
