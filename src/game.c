@@ -58,11 +58,11 @@ orxSTATUS orxFASTCALL Bootstrap()
 {
   orxSTATUS eResult = orxSTATUS_SUCCESS;
 
-  // Adds default release config paths or do other stuffs
+  // Adds default config search path at executable parent directory
   orxResource_AddStorage(orxCONFIG_KZ_RESOURCE_GROUP, "../", orxFALSE);
 
-  // Loads a specific config file
-  /* orxConfig_Load("SomeSpecificConfig.ini"); */
+  // Load a user settings file manually. This is done so that orxCrypt usage can be separated out.
+  orxConfig_Load("Settings.ini");
 
   // Done!
   return eResult;
