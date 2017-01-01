@@ -121,9 +121,6 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pstContext)
 
   orxObject_GetSpeed(pstPlayer, &vMove);
   vMove.fX = 0;
-  /* orxVector_Copy(&vMove, &orxVECTOR_0); */
-  /* orxVector_Mulf(&vWalkVelocity, &vWalkVelocity, fPlayerSpeed); */
-  /* orxVector_Mulf(&vJumpVelocity, &vJumpVelocity, fPlayerSpeed); */
 
   if (orxInput_IsActive("MoveRight")) {
     orxObject_SetScale(pstPlayer, &vFlipRight);
@@ -133,7 +130,6 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pstContext)
   if (orxInput_IsActive("MoveLeft")) {
     orxObject_SetScale(pstPlayer, &vFlipLeft);
     orxObject_SetTargetAnim(pstPlayer, "SoldierRun");
-    /* orxVector_Neg(&vWalkVelocity, &vWalkVelocity); */
     vMove.fX -= fPlayerSpeed;
   }
   if (orxInput_IsActive("Jump") && orxInput_HasNewStatus("Jump")) {
