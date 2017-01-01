@@ -41,17 +41,16 @@ orxBOOL HaveCollided(orxOBJECT *pstSenderObject, orxOBJECT *pstRecipientObject, 
 {
   orxSTRING senderObjectName = (orxSTRING)orxObject_GetName(pstSenderObject);
   orxSTRING recipientObjectName = (orxSTRING)orxObject_GetName(pstRecipientObject);
-  orxBOOL collided = orxFALSE;
+  orxBOOL collided = orxTRUE;
   if ((orxString_Compare(senderObjectName, objectA) == 0) && (orxString_Compare(recipientObjectName, objectB) == 0)) {
-      collided = orxTRUE;
       *pstObjectA = pstSenderObject;
       *pstObjectB = pstRecipientObject;
-    }
-  else if ((orxString_Compare(senderObjectName, objectB) == 0) && (orxString_Compare(recipientObjectName, objectA) == 0)) {
-      collided = orxTRUE;
+  } else if ((orxString_Compare(senderObjectName, objectB) == 0) && (orxString_Compare(recipientObjectName, objectA) == 0)) {
       *pstObjectB = pstSenderObject;
       *pstObjectA = pstRecipientObject;
-    }
+  } else {
+    collided = orxFALSE;
+  }
   return collided;
 }
 
