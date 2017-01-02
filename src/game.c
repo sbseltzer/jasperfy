@@ -1,41 +1,10 @@
 //! Includes
 #include "game.h"
 
-
 //! Variables
-orxOBJECT* pstPlayer;
-orxOBJECT* pstPlayerGun;
-orxOBJECT* pstScoreObject;
-orxS16 score = 0;
 orxOBJECT* pstScene;
 
 //! Code
-
-void AddScore(int increase)
-{
-  score += increase;
-
-  orxCHAR formattedScore[6];
-  orxString_Print(formattedScore, "%d", score);
-
-  orxObject_SetTextString(pstScoreObject, formattedScore);
-}
-
-void CreateExplosionAtObject(orxOBJECT *object, orxSTRING exploderObjectName)
-{
-  orxLOG("explode %s", exploderObjectName);
-
-  if (object == orxNULL)
-    return;
-
-  orxVECTOR objectVector;
-  orxObject_GetWorldPosition(object, &objectVector);
-  objectVector.fZ = 0.0;
-
-  orxOBJECT *explosion = orxObject_CreateFromConfig(exploderObjectName);
-
-  orxObject_SetPosition(explosion, &objectVector);
-}
 
 orxBOOL HaveCollided(orxOBJECT *pstSenderObject, orxOBJECT *pstRecipientObject, orxSTRING objectA, orxSTRING objectB, orxOBJECT **pstObjectA, orxOBJECT **pstObjectB)
 {
@@ -61,7 +30,7 @@ orxSTATUS orxFASTCALL Bootstrap()
   // Adds default config search path at executable parent directory
   orxResource_AddStorage(orxCONFIG_KZ_RESOURCE_GROUP, "../", orxFALSE);
 
-  // Load a user settings file manually. This is done so that orxCrypt usage can be separated out.
+  // Load a user settings file manually. This is done so that orxCrypt usage can be separated out (if so desired)
   orxConfig_Load("Settings.ini");
 
   // Done!
@@ -80,26 +49,6 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
 
     orxSTRING senderObjectName = (orxSTRING)orxObject_GetName(pstSenderObject);
     orxSTRING recipientObjectName = (orxSTRING)orxObject_GetName(pstRecipientObject);
-
-    if (HaveCollided(pstSenderObject, pstRecipientObject, "StarObject", "PlayerObject", &pstObjectA, &pstObjectB)) {
-      orxObject_SetLifeTime(pstObjectA, 0);
-      AddScore(1000);
-    }
-
-    if (HaveCollided(pstSenderObject, pstRecipientObject, "BulletObject", "MonsterObject", &pstObjectA, &pstObjectB)) {
-      CreateExplosionAtObject(pstObjectA, "JellyExploder");
-      orxObject_SetLifeTime(pstObjectB, 0.1);
-      orxObject_SetLifeTime(pstObjectA, 0.1);
-      AddScore(250);
-    }
-
-    if (HaveCollided(pstSenderObject, pstRecipientObject, "PlayerObject", "MonsterObject", &pstObjectA, &pstObjectB)) {
-      pstPlayer = orxNULL;
-      CreateExplosionAtObject(pstObjectA, "PlayerExploder");
-      orxObject_SetLifeTime(pstObjectA, 0);
-      orxObject_Enable(pstObjectA, orxFALSE);
-      orxObject_AddTimeLineTrack(pstScene, "PopUpGameOverTrack");
-    }
   }
 
   return eResult;
@@ -107,46 +56,13 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
 
 void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pstContext)
 {
-  orxFLOAT fPlayerSpeed = 600;
-  orxVECTOR vMove;
-
-  if (pstPlayer == orxNULL) {
-    return;
-  }
-
-  orxObject_GetSpeed(pstPlayer, &vMove);
-  vMove.fX = 0.0f;
-
-  if (orxInput_IsActive("MoveRight")) {
-    orxObject_SetFlip(pstPlayer, orxFALSE, orxFALSE);
-    orxObject_SetTargetAnim(pstPlayer, "SoldierRun");
-    vMove.fX += fPlayerSpeed;
-  }
-  if (orxInput_IsActive("MoveLeft")) {
-    orxObject_SetFlip(pstPlayer, orxTRUE, orxFALSE);
-    orxObject_SetTargetAnim(pstPlayer, "SoldierRun");
-    vMove.fX -= fPlayerSpeed;
-  }
-  if (orxInput_IsActive("Jump") && orxInput_HasNewStatus("Jump")) {
-    vMove.fY -= fPlayerSpeed * 2.5f;
-  }
-
-  if (orxInput_IsActive("Shoot")) {
-    orxObject_Enable(pstPlayerGun, orxTRUE);
-  }
-  else {
-    orxObject_Enable(pstPlayerGun, orxFALSE);
-  }
-
-  orxObject_SetSpeed(pstPlayer, &vMove);
-
 }
 
 orxSTATUS orxFASTCALL Init()
 {
   orxSTATUS eResult = orxSTATUS_SUCCESS;
 
-  orxCLOCK       *pstClock;
+  orxCLOCK *pstClock;
 
   // Creates viewport
   orxViewport_CreateFromConfig("Viewport");
@@ -154,23 +70,13 @@ orxSTATUS orxFASTCALL Init()
   // Creates pstScene
   pstScene = orxObject_CreateFromConfig("Scene");
 
-  // Create Player
-  pstPlayer = orxObject_CreateFromConfig("PlayerObject");
-
-  // Create PlayerGun
-  pstPlayerGun = (orxOBJECT*)orxObject_GetChild(pstPlayer);
-
-  // Disable gun object to keep it from spawning bullets
-  orxObject_Enable(pstPlayerGun, orxFALSE);
-
   // Add physics event handler
   orxEvent_AddHandler(orxEVENT_TYPE_PHYSICS, PhysicsEventHandler);
 
+  // Register Update handler
   pstClock = orxClock_FindFirst(orx2F(-1.0f), orxCLOCK_TYPE_CORE);
- 
   orxClock_Register(pstClock, Update, orxNULL, orxMODULE_ID_MAIN, orxCLOCK_PRIORITY_NORMAL);
 
-  pstScoreObject = orxObject_CreateFromConfig("ScoreObject");
   // Done!
   return eResult;
 }
