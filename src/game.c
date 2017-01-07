@@ -81,8 +81,6 @@ orxSTATUS orxFASTCALL Init()
   return eResult;
 }
 
-
-
 orxSTATUS orxFASTCALL Run()
 {
   orxSTATUS eResult = orxSTATUS_SUCCESS;
