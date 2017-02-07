@@ -1,5 +1,6 @@
 //! Includes
 #include "game.h"
+#include "map.hpp"
 
 //! Variables
 orxOBJECT* pstScene;
@@ -76,6 +77,8 @@ orxSTATUS orxFASTCALL Init()
   // Register Update handler
   pstClock = orxClock_FindFirst(orx2F(-1.0f), orxCLOCK_TYPE_CORE);
   orxClock_Register(pstClock, Update, orxNULL, orxMODULE_ID_MAIN, orxCLOCK_PRIORITY_NORMAL);
+
+  loadMapData("MidLayer");
 
   // Done!
   return eResult;
