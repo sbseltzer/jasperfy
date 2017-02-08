@@ -1,8 +1,6 @@
 #include <orx.h>
 #include <string>
 
-using std::string;
-
 struct MapParser {
 
 public:
@@ -12,7 +10,7 @@ public:
 private:
   orxU32 index;
   orxU32 length;
-  string mapString;
+  std::string mapString;
   orxHASHTABLE *tileTable;
 
   void loadTilesIDs() {
@@ -74,7 +72,7 @@ private:
       orxLOG("Reading tileID: mapString[%u] = '%c'", index, ch);
       ch = mapString[++index];
     }
-    string tileID = mapString.substr(tileStartIndex, index - tileStartIndex);
+    std::string tileID = mapString.substr(tileStartIndex, index - tileStartIndex);
     tileSection = (orxSTRING)orxHashTable_Get(tileTable, (orxU64)orxString_GetID(tileID.c_str()));
     gridPosition.fX++;
     orxLOG("tileID is substring from %u to %u: %s %s", tileStartIndex, index, tileID.c_str(), tileSection);
