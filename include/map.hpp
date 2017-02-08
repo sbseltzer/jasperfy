@@ -48,7 +48,7 @@ struct MapParser {
       // Make sure the key value is a valid section
       const orxSTRING value = orxConfig_GetString(key);
       if (orxConfig_HasSection(value)) {
-        orxHashTable_Add(tileTable, (orxU64) orxString_ToCRC(key), (void *) (orxU64) value);
+        orxHashTable_Add(tileTable, (orxU64) orxString_GetID(key), (void *) (orxU64) value);
         orxLOG("%s -> %s", key, value);
       }
     }
@@ -77,7 +77,7 @@ struct MapParser {
       ch = mapString[++index];
     }
     string tileID = mapString.substr(tileStartIndex, index - tileStartIndex);
-    tileSection = (orxSTRING)orxHashTable_Get(tileTable, (orxU64)orxString_ToCRC(tileID.c_str()));
+    tileSection = (orxSTRING)orxHashTable_Get(tileTable, (orxU64)orxString_GetID(tileID.c_str()));
     gridPosition.fX++;
     orxLOG("tileID is substring from %u to %u: %s %s", tileStartIndex, index, tileID.c_str(), tileSection);
     return ( index < length );
