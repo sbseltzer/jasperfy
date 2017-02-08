@@ -4,44 +4,25 @@
 using std::string;
 
 struct MapParser {
+
+public:
+  orxVECTOR gridPosition;
+  orxSTRING tileSection;
+
+private:
   orxU32 index;
   orxU32 length;
   string mapString;
   orxHASHTABLE *tileTable;
-  orxVECTOR gridPosition;
-  orxSTRING tileSection;
 
-  orxBOOL Setup(const orxSTRING mapSection, const orxSTRING tileTableSection) {
-    index = 0;
-    orxVector_Set(&gridPosition, 0.0, 0.0, 0.0);
-    tileSection = (orxSTRING) orxNULL;
-
-    if (tileTable != orxNULL)
-      orxHashTable_Delete(tileTable);
-    tileTable = orxNULL;
-    loadTilesIDs(tileTableSection);
-
-    loadMapData(mapSection);
-    length = orxString_GetLength(mapString.c_str());
-
-    orxLOG("mapString: %u\n\"%s\"", length, mapString.c_str());
-  }
-
-  MapParser() :
-    tileTable((orxHASHTABLE*)orxNULL), gridPosition(orxVECTOR_0), tileSection((orxSTRING)orxNULL),
-    index(0), length(0), mapString("") {}
-
-  void loadMapData(const orxSTRING sectionName) {
-    orxConfig_PushSection(sectionName);
-    mapString = orxConfig_GetString("Map");
-    orxConfig_PopSection();
-  }
-  void loadTilesIDs(const orxSTRING sectionName) {
-    orxConfig_PushSection(sectionName);
+  void loadTilesIDs() {
     const orxU32 numKeys = orxConfig_GetKeyCounter();
     if (tileTable == orxNULL) {
       tileTable = orxHashTable_Create(numKeys, orxHASHTABLE_KU32_FLAG_NONE, orxMEMORY_TYPE_MAIN);
+    } else {
+      orxHashTable_Clear(tileTable);
     }
+    // Populate table
     for (orxU32 keyIndex = 0; keyIndex < numKeys; keyIndex++) {
       const orxSTRING key = orxConfig_GetKey(keyIndex);
       orxLOG("attempting to load tileID %s", key);
@@ -52,6 +33,23 @@ struct MapParser {
         orxLOG("%s -> %s", key, value);
       }
     }
+  }
+
+  void loadMapData(const orxSTRING sectionName) {
+    const orxSTRING tileTableSection;
+
+    orxConfig_PushSection(sectionName);
+    mapString = orxConfig_GetString("Map");
+    tileTableSection = orxConfig_GetString("Tiles");
+    orxConfig_PopSection();
+
+    // If a tileTable exists, delete it.
+    if (tileTable != orxNULL)
+      orxHashTable_Delete(tileTable);
+    tileTable = orxNULL;
+
+    orxConfig_PushSection(tileTableSection);
+    loadTilesIDs();
     orxConfig_PopSection();
   }
 
@@ -83,6 +81,24 @@ struct MapParser {
     return ( index < length );
   }
 
+public:
+  MapParser() :
+    tileTable((orxHASHTABLE*)orxNULL),
+    gridPosition(orxVECTOR_0),
+    tileSection((orxSTRING)orxNULL),
+    index(0), length(0), mapString("") {}
+
+  orxBOOL Setup(const orxSTRING mapSection) {
+    index = 0;
+    orxVector_Set(&gridPosition, 0.0, 0.0, 0.0);
+    tileSection = (orxSTRING) orxNULL;
+
+    loadMapData(mapSection);
+    length = orxString_GetLength(mapString.c_str());
+
+    orxLOG("mapString: %u\n\"%s\"", length, mapString.c_str());
+  }
+
   orxBOOL nextTile() {
     orxLOG("Parsing next tile");
     // Skip whitespace, keeping a count of linebreaks along the way.
@@ -100,10 +116,10 @@ struct MapParser {
   }
 };
 
-void loadMapData(const orxSTRING mapName, const orxSTRING tileTableName) {
-  if (mapName != orxNULL && tileTableName != orxNULL) {
+void loadMapData(const orxSTRING mapName) {
+  if (mapName != orxNULL) {
     MapParser parser;
-    parser.Setup(mapName, tileTableName);
+    parser.Setup(mapName);
     while (parser.nextTile()) {
       orxLOG("Pos<%f,%f,%f> %s", parser.gridPosition.fX, parser.gridPosition.fY, parser.gridPosition.fZ, parser.tileSection);
     }
