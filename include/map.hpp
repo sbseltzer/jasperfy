@@ -5,11 +5,13 @@ struct MapParser {
 
 public:
   orxVECTOR gridPosition;
+  orxVECTOR worldPosition;
   orxSTRING tileSection;
 
 private:
   orxU32 index;
   orxU32 length;
+  orxU32 gridSize;
   std::string mapString;
   orxHASHTABLE *tileTable;
 
@@ -37,6 +39,7 @@ private:
     const orxSTRING tileTableSection;
 
     orxConfig_PushSection(sectionName);
+    gridSize = orxConfig_GetU32("GridSize");
     mapString = orxConfig_GetString("Map");
     tileTableSection = orxConfig_GetString("Tiles");
     orxConfig_PopSection();
@@ -83,12 +86,14 @@ public:
   MapParser() :
     tileTable((orxHASHTABLE*)orxNULL),
     gridPosition(orxVECTOR_0),
+    worldPosition(orxVECTOR_0),
     tileSection((orxSTRING)orxNULL),
-    index(0), length(0), mapString("") {}
+    index(0), length(0), gridSize(0), mapString("") {}
 
   orxBOOL Setup(const orxSTRING mapSection) {
     index = 0;
     orxVector_Set(&gridPosition, 0.0, 0.0, 0.0);
+    orxVector_Set(&worldPosition, 0.0, 0.0, 0.0);
     tileSection = (orxSTRING) orxNULL;
 
     loadMapData(mapSection);
@@ -104,6 +109,8 @@ public:
     orxBOOL continueParsing = skipWhiteSpace(lineBreaks);
     orxLOG("lineBreaks: %u", lineBreaks);
     gridPosition.fY += lineBreaks;
+    worldPosition.fX = gridPosition.fX * gridSize;
+    worldPosition.fY = gridPosition.fY * gridSize;
     // If a linebreak was hit, reset tilespace column to 0.
     if (lineBreaks > 0) { gridPosition.fX = 0; }
     // If we hit the end of the string, return as such.
@@ -119,6 +126,9 @@ void loadMapData(const orxSTRING mapName) {
     MapParser parser;
     parser.Setup(mapName);
     while (parser.nextTile()) {
+      if (parser.tileSection == orxNULL) continue;
+      orxOBJECT *object = orxObject_CreateFromConfig(parser.tileSection);
+      orxObject_SetPosition(object, &parser.worldPosition);
       orxLOG("Pos<%f,%f,%f> %s", parser.gridPosition.fX, parser.gridPosition.fY, parser.gridPosition.fZ, parser.tileSection);
     }
   }
