@@ -38,17 +38,14 @@ private:
   void loadMapData(const orxSTRING sectionName) {
     const orxSTRING tileTableSection;
 
+    // Read map info from config
     orxConfig_PushSection(sectionName);
     gridSize = orxConfig_GetU32("GridSize");
     mapString = orxConfig_GetString("Map");
     tileTableSection = orxConfig_GetString("Tiles");
     orxConfig_PopSection();
 
-    // If a tileTable exists, delete it.
-    if (tileTable != orxNULL)
-      orxHashTable_Delete(tileTable);
-    tileTable = orxNULL;
-
+    // Populate the tile table
     orxConfig_PushSection(tileTableSection);
     loadTilesIDs();
     orxConfig_PopSection();
@@ -77,7 +74,6 @@ private:
     }
     std::string tileID = mapString.substr(tileStartIndex, index - tileStartIndex);
     tileSection = (orxSTRING)orxHashTable_Get(tileTable, (orxU64)orxString_GetID(tileID.c_str()));
-    gridPosition.fX++;
     orxLOG("tileID is substring from %u to %u: %s %s", tileStartIndex, index, tileID.c_str(), tileSection);
     return ( index < length );
   }
@@ -109,13 +105,14 @@ public:
     orxBOOL continueParsing = skipWhiteSpace(lineBreaks);
     orxLOG("lineBreaks: %u", lineBreaks);
     gridPosition.fY += lineBreaks;
-    worldPosition.fX = gridPosition.fX * gridSize;
-    worldPosition.fY = gridPosition.fY * gridSize;
     // If a linebreak was hit, reset tilespace column to 0.
     if (lineBreaks > 0) { gridPosition.fX = 0; }
+    else { gridPosition.fX++; }
     // If we hit the end of the string, return as such.
     if (!continueParsing) { return orxFALSE; }
-
+    // Update the world position
+    worldPosition.fX = gridPosition.fX * gridSize;
+    worldPosition.fY = gridPosition.fY * gridSize;
     // Update current tile ID and return false if it detects end of string.
     return updateTileID();
   }
