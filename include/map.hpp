@@ -35,7 +35,7 @@ private:
     }
   }
 
-  void loadMapData(const orxSTRING sectionName) {
+  void readConfig(const orxSTRING sectionName) {
     const orxSTRING tileTableSection;
 
     // Read map info from config
@@ -45,7 +45,7 @@ private:
     tileTableSection = orxConfig_GetString("Tiles");
     orxConfig_PopSection();
 
-    // Populate the tile table
+    // Populate the tile table using the section name specified by the map
     orxConfig_PushSection(tileTableSection);
     loadTilesIDs();
     orxConfig_PopSection();
@@ -92,7 +92,7 @@ public:
     orxVector_Set(&worldPosition, 0.0, 0.0, 0.0);
     tileSection = (orxSTRING) orxNULL;
 
-    loadMapData(mapSection);
+    readConfig(mapSection);
     length = orxString_GetLength(mapString.c_str());
 
     orxLOG("mapString: %u\n\"%s\"", length, mapString.c_str());
@@ -118,7 +118,8 @@ public:
   }
 };
 
-void loadMapData(const orxSTRING mapName) {
+// Implementation of map generation
+void readConfig(const orxSTRING mapName) {
   if (mapName != orxNULL) {
     MapParser parser;
     parser.Setup(mapName);
