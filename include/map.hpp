@@ -119,7 +119,7 @@ public:
 };
 
 // Implementation of map generation
-void readConfig(const orxSTRING mapName) {
+void loadMapData(const orxSTRING mapName) {
   if (mapName != orxNULL) {
     MapParser parser;
     parser.Setup(mapName);
