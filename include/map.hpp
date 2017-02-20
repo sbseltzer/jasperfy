@@ -103,6 +103,7 @@ public:
     length = orxString_GetLength(mapString.c_str());
 
     orxLOG("mapString: %u\n\"%s\"", length, mapString.c_str());
+    return true;
   }
 
   orxBOOL nextTile() {
