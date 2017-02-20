@@ -7,6 +7,7 @@ public:
   orxVECTOR gridPosition;
   orxVECTOR worldPosition;
   orxSTRING tileSection;
+  orxSTRING tileBodySection;
 
 private:
   orxU32 index;
@@ -14,6 +15,7 @@ private:
   orxU32 gridSize;
   std::string mapString;
   orxHASHTABLE *tileTable;
+  orxHASHTABLE *tileBodyTable;
 
   void loadTilesIDs() {
     const orxU32 numKeys = orxConfig_GetKeyCounter();
@@ -23,14 +25,19 @@ private:
       orxHashTable_Clear(tileTable);
     }
     // Populate table
-    for (orxU32 keyIndex = 0; keyIndex < numKeys; keyIndex++) {
-      const orxSTRING key = orxConfig_GetKey(keyIndex);
-      orxLOG("attempting to load tileID %s", key);
+    for (orxU32 tileKeyIndex = 0; tileKeyIndex < numKeys; tileKeyIndex++) {
+      const orxSTRING tileKey = orxConfig_GetKey(tileKeyIndex);
+      orxLOG("attempting to load tileID %s", tileKey);
       // Make sure the key value is a valid section
-      const orxSTRING value = orxConfig_GetString(key);
-      if (orxConfig_HasSection(value)) {
-        orxHashTable_Add(tileTable, (orxU64) orxString_GetID(key), (void *) (orxU64) value);
-        orxLOG("%s -> %s", key, value);
+      const orxSTRING tileValue = orxConfig_GetString(tileKey);
+      if (orxConfig_HasSection(tileValue)) {
+        orxHashTable_Add(tileTable, (orxU64) orxString_GetID(tileKey), (void *) (orxU64) tileValue);
+        orxConfig_PushSection(tileValue);
+        if (orxConfig_HasValue("Body")) {
+          // orxHashTable_Add(tileBodyTable, (orxU64) orxString_GetID(tileKey), (void *) (orxU64) tileValue);
+        }
+        orxConfig_PopSection();
+        orxLOG("%s -> %s", tileKey, tileValue);
       }
     }
   }
@@ -125,6 +132,7 @@ void loadMapData(const orxSTRING mapName) {
     parser.Setup(mapName);
     while (parser.nextTile()) {
       if (parser.tileSection == orxNULL) continue;
+      orxSTRING tileBody = orxConfig_
       orxOBJECT *object = orxObject_CreateFromConfig(parser.tileSection);
       orxObject_SetPosition(object, &parser.worldPosition);
       orxLOG("Pos<%f,%f,%f> %s", parser.gridPosition.fX, parser.gridPosition.fY, parser.gridPosition.fZ, parser.tileSection);
