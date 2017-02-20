@@ -1,6 +1,31 @@
 #include <orx.h>
 #include <string>
 
+/*! Load the specified section into a hashtable */
+orxHASHTABLE* map_LoadTileTable(const orxSTRING _zName) {
+  orxU32 numKeys;
+  orxHASHTABLE *pstTileTable;
+  orxConfig_PushSection(_zName);
+  numKeys = orxConfig_GetKeyCounter();
+  orxASSERT(numKeys > 0);
+  pstTileTable = orxHashTable_Create(numKeys, orxHASHTABLE_KU32_FLAG_NONE, orxMEMORY_TYPE_MAIN);
+  orxASSERT(pstTileTable);
+  orxLOG("created hashtable with %u keys", numKeys);
+  // Populate table
+  for (orxU32 tileKeyIndex = 0; tileKeyIndex < numKeys; tileKeyIndex++) {
+    const orxSTRING tileKey = orxConfig_GetKey(tileKeyIndex);
+    orxLOG("attempting to load tileID %s", tileKey);
+    // Make sure the key value is a valid section
+    const orxSTRING tileValue = orxConfig_GetString(tileKey);
+    if (orxConfig_HasSection(tileValue)) {
+      orxLOG("%s -> %s", tileKey, tileValue);
+      orxHashTable_Add(pstTileTable, (orxU64) orxString_GetID(tileKey), (void *) (orxU64) tileValue);
+    }
+  }
+  orxConfig_PopSection();
+  return pstTileTable;
+}
+
 struct MapParser {
 
 public:
@@ -54,9 +79,8 @@ private:
     orxConfig_PopSection();
 
     // Populate the tile table using the section name specified by the map
-    orxConfig_PushSection(tileTableSection);
-    loadTilesIDs();
-    orxConfig_PopSection();
+    tileTable = map_LoadTileTable(tileTableSection);
+    orxASSERT(tileTable);
   }
 
   orxBOOL skipWhiteSpace(orxU32 &lineBreaks) {
