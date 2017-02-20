@@ -176,12 +176,19 @@ void loadMapData(const orxSTRING mapName) {
     while (parser.nextTile()) {
       if (parser.tileSection == orxNULL) continue;
       orxConfig_PushSection(parser.tileSection);
-      if (orxString_Compare(orxConfig_GetString("Type"), "box") == 0) {
-        orxConfig_SetVector("TopLeft", &parser.tileTopLeft);
-        orxConfig_SetVector("BottomRight", &parser.tileBottomRight);
+      const orxSTRING partType = orxConfig_GetString("Type");
+      if (orxString_Compare(partType, "") != 0) {
+        if (orxString_Compare(partType, "box") == 0) {
+          orxConfig_SetVector("TopLeft", &parser.tileTopLeft);
+          orxConfig_SetVector("BottomRight", &parser.tileBottomRight);
+        } else if (orxString_Compare(partType, "sphere") == 0) {
+          orxConfig_SetVector("Center", &parser.tileCenter);
+        } else if (orxString_Compare(partType, "mesh") == 0) {
+          orxLOG("Mesh type unsupported: %s", parser.tileSection);
+        }
+        orxBody_AddPartFromConfig(body, parser.tileSection);
       }
       orxConfig_PopSection();
-      orxBody_AddPartFromConfig(body, parser.tileSection);
       orxOBJECT *object = orxObject_CreateFromConfig(parser.tileSection);
       orxObject_SetPosition(object, &parser.tileTopLeft);
       // orxLOG("Pos<%f,%f,%f> %s", parser.gridPosition.fX, parser.gridPosition.fY, parser.gridPosition.fZ, parser.tileSection);
