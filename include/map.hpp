@@ -17,7 +17,6 @@ private:
   orxU32 gridSize;
   std::string mapString;
   orxHASHTABLE *tileTable;
-  orxHASHTABLE *tileBodyTable;
 
   void loadTilesIDs() {
     const orxU32 numKeys = orxConfig_GetKeyCounter();
@@ -148,8 +147,7 @@ void loadMapData(const orxSTRING mapName) {
   if (mapName != orxNULL) {
     MapParser parser(mapName);
     const orxOBJECT *map = orxObject_CreateFromConfig(mapName);
-    const orxSTRING bodyName = orxConfig_GetString("BodyDef");
-    orxBODY *body = orxBody_CreateFromConfig((const orxSTRUCTURE *)map, bodyName);
+    orxBODY *body = orxOBJECT_GET_STRUCTURE(map, BODY);
 
     while (parser.nextTile()) {
       if (parser.tileSection == orxNULL) continue;
