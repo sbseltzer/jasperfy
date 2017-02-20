@@ -133,7 +133,7 @@ void loadMapData(const orxSTRING mapName) {
     parser.Setup(mapName);
     while (parser.nextTile()) {
       if (parser.tileSection == orxNULL) continue;
-      orxSTRING tileBody = orxConfig_
+      // orxSTRING tileBody = orxConfig_
       orxOBJECT *object = orxObject_CreateFromConfig(parser.tileSection);
       orxObject_SetPosition(object, &parser.worldPosition);
       orxLOG("Pos<%f,%f,%f> %s", parser.gridPosition.fX, parser.gridPosition.fY, parser.gridPosition.fZ, parser.tileSection);

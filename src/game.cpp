@@ -69,7 +69,7 @@ orxSTATUS orxFASTCALL Init()
   orxViewport_CreateFromConfig("Viewport");
 
   // Creates pstScene
-  // pstScene = orxObject_CreateFromConfig("Scene");
+  pstScene = orxObject_CreateFromConfig("Scene");
 
   // Add physics event handler
   orxEvent_AddHandler(orxEVENT_TYPE_PHYSICS, PhysicsEventHandler);
