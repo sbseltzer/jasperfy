@@ -7,9 +7,9 @@ public:
   orxVECTOR gridPosition;
   orxVECTOR worldPosition;
   orxSTRING tileSection;
-  orxSTRING tileBodySection;
 
 private:
+  const orxSTRING mapName;
   orxU32 index;
   orxU32 length;
   orxU32 gridSize;
@@ -27,7 +27,7 @@ private:
     // Populate table
     for (orxU32 tileKeyIndex = 0; tileKeyIndex < numKeys; tileKeyIndex++) {
       const orxSTRING tileKey = orxConfig_GetKey(tileKeyIndex);
-      orxLOG("attempting to load tileID %s", tileKey);
+      // orxLOG("attempting to load tileID %s", tileKey);
       // Make sure the key value is a valid section
       const orxSTRING tileValue = orxConfig_GetString(tileKey);
       if (orxConfig_HasSection(tileValue)) {
@@ -37,7 +37,7 @@ private:
           // orxHashTable_Add(tileBodyTable, (orxU64) orxString_GetID(tileKey), (void *) (orxU64) tileValue);
         }
         orxConfig_PopSection();
-        orxLOG("%s -> %s", tileKey, tileValue);
+        // orxLOG("%s -> %s", tileKey, tileValue);
       }
     }
   }
@@ -62,7 +62,7 @@ private:
     if (index >= length) { return orxFALSE; }
     orxCHAR ch = mapString[index];
     while ( ( ch == ' ' || ch == '\r' || ch == '\n' ) && index < length ) {
-      orxLOG("Skipping whitespace: mapString[%u] = '%c'", index, ch);
+      // orxLOG("Skipping whitespace: mapString[%u] = '%c'", index, ch);
       if (ch == '\n') { lineBreaks++; }
       ch = mapString[++index];
     }
@@ -76,42 +76,46 @@ private:
     orxCHAR ch = mapString[index];
     orxU32 tileStartIndex = index;
     while (ch != ' ' && ch != '\r' && ch != '\n' && index < length) {
-      orxLOG("Reading tileID: mapString[%u] = '%c'", index, ch);
+      // orxLOG("Reading tileID: mapString[%u] = '%c'", index, ch);
       ch = mapString[++index];
     }
     std::string tileID = mapString.substr(tileStartIndex, index - tileStartIndex);
     tileSection = (orxSTRING)orxHashTable_Get(tileTable, (orxU64)orxString_GetID(tileID.c_str()));
-    orxLOG("tileID is substring from %u to %u: %s %s", tileStartIndex, index, tileID.c_str(), tileSection);
+    // orxLOG("tileID is substring from %u to %u: %s %s", tileStartIndex, index, tileID.c_str(), tileSection);
     return ( index < length );
   }
 
-public:
-  MapParser() :
-    tileTable((orxHASHTABLE*)orxNULL),
-    gridPosition(orxVECTOR_0),
-    worldPosition(orxVECTOR_0),
-    tileSection((orxSTRING)orxNULL),
-    index(0), length(0), gridSize(0), mapString("") {}
-
-  orxBOOL Setup(const orxSTRING mapSection) {
+  orxBOOL Setup() {
     index = 0;
     orxVector_Set(&gridPosition, 0.0, 0.0, 0.0);
     orxVector_Set(&worldPosition, 0.0, 0.0, 0.0);
     tileSection = (orxSTRING) orxNULL;
 
-    readConfig(mapSection);
+    readConfig(mapName);
     length = orxString_GetLength(mapString.c_str());
 
-    orxLOG("mapString: %u\n\"%s\"", length, mapString.c_str());
+    // orxLOG("mapString: %u\n\"%s\"", length, mapString.c_str());
+    orxConfig_PushSection(mapName);
     return true;
   }
 
+public:
+  MapParser(const orxSTRING mapSection) :
+    mapName(mapSection),
+    tileTable((orxHASHTABLE*)orxNULL),
+    gridPosition(orxVECTOR_0),
+    worldPosition(orxVECTOR_0),
+    tileSection((orxSTRING)orxNULL),
+    index(0), length(0), gridSize(0), mapString("") {
+    Setup();
+  }
+
   orxBOOL nextTile() {
-    orxLOG("Parsing next tile");
+    // orxLOG("Parsing next tile");
     // Skip whitespace, keeping a count of linebreaks along the way.
     orxU32 lineBreaks = 0;
     orxBOOL continueParsing = skipWhiteSpace(lineBreaks);
-    orxLOG("lineBreaks: %u", lineBreaks);
+    // orxLOG("lineBreaks: %u", lineBreaks);
     gridPosition.fY += lineBreaks;
     // If a linebreak was hit, reset tilespace column to 0.
     if (lineBreaks > 0) { gridPosition.fX = 0; }
@@ -122,21 +126,25 @@ public:
     worldPosition.fX = gridPosition.fX * gridSize;
     worldPosition.fY = gridPosition.fY * gridSize;
     // Update current tile ID and return false if it detects end of string.
-    return updateTileID();
+    continueParsing = updateTileID();
+    if (!continueParsing) {
+      orxConfig_PopSection();
+    }
+    return continueParsing;
   }
 };
 
 // Implementation of map generation
 void loadMapData(const orxSTRING mapName) {
   if (mapName != orxNULL) {
-    MapParser parser;
-    parser.Setup(mapName);
+    MapParser parser(mapName);
+    orxOBJECT *map = orxObject_CreateFromConfig(mapName);
     while (parser.nextTile()) {
       if (parser.tileSection == orxNULL) continue;
       // orxSTRING tileBody = orxConfig_
       orxOBJECT *object = orxObject_CreateFromConfig(parser.tileSection);
       orxObject_SetPosition(object, &parser.worldPosition);
-      orxLOG("Pos<%f,%f,%f> %s", parser.gridPosition.fX, parser.gridPosition.fY, parser.gridPosition.fZ, parser.tileSection);
+      // orxLOG("Pos<%f,%f,%f> %s", parser.gridPosition.fX, parser.gridPosition.fY, parser.gridPosition.fZ, parser.tileSection);
     }
   }
 }
