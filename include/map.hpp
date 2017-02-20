@@ -43,31 +43,6 @@ private:
   std::string mapString;
   orxHASHTABLE *tileTable;
 
-  void loadTilesIDs() {
-    const orxU32 numKeys = orxConfig_GetKeyCounter();
-    if (tileTable == orxNULL) {
-      tileTable = orxHashTable_Create(numKeys, orxHASHTABLE_KU32_FLAG_NONE, orxMEMORY_TYPE_MAIN);
-    } else {
-      orxHashTable_Clear(tileTable);
-    }
-    // Populate table
-    for (orxU32 tileKeyIndex = 0; tileKeyIndex < numKeys; tileKeyIndex++) {
-      const orxSTRING tileKey = orxConfig_GetKey(tileKeyIndex);
-      // orxLOG("attempting to load tileID %s", tileKey);
-      // Make sure the key value is a valid section
-      const orxSTRING tileValue = orxConfig_GetString(tileKey);
-      if (orxConfig_HasSection(tileValue)) {
-        orxHashTable_Add(tileTable, (orxU64) orxString_GetID(tileKey), (void *) (orxU64) tileValue);
-        orxConfig_PushSection(tileValue);
-        if (orxConfig_HasValue("Body")) {
-          // orxHashTable_Add(tileBodyTable, (orxU64) orxString_GetID(tileKey), (void *) (orxU64) tileValue);
-        }
-        orxConfig_PopSection();
-        // orxLOG("%s -> %s", tileKey, tileValue);
-      }
-    }
-  }
-
   void readConfig(const orxSTRING sectionName) {
     const orxSTRING tileTableSection;
 
