@@ -5,7 +5,9 @@ struct MapParser {
 
 public:
   orxVECTOR gridPosition;
-  orxVECTOR worldPosition;
+  orxVECTOR tileTopLeft;
+  orxVECTOR tileCenter;
+  orxVECTOR tileBottomRight;
   orxSTRING tileSection;
 
 private:
@@ -88,7 +90,9 @@ private:
   orxBOOL Setup() {
     index = 0;
     orxVector_Set(&gridPosition, 0.0, 0.0, 0.0);
-    orxVector_Set(&worldPosition, 0.0, 0.0, 0.0);
+    orxVector_Set(&tileTopLeft, 0.0, 0.0, 0.0);
+    orxVector_Set(&tileCenter, 0.0, 0.0, 0.0);
+    orxVector_Set(&tileBottomRight, 0.0, 0.0, 0.0);
     tileSection = (orxSTRING) orxNULL;
 
     readConfig(mapName);
@@ -104,7 +108,7 @@ public:
     mapName(mapSection),
     tileTable((orxHASHTABLE*)orxNULL),
     gridPosition(orxVECTOR_0),
-    worldPosition(orxVECTOR_0),
+    tileTopLeft(orxVECTOR_0),
     tileSection((orxSTRING)orxNULL),
     index(0), length(0), gridSize(0), mapString("") {
     Setup();
@@ -122,9 +126,14 @@ public:
     else { gridPosition.fX++; }
     // If we hit the end of the string, return as such.
     if (!continueParsing) { return orxFALSE; }
-    // Update the world position
-    worldPosition.fX = gridPosition.fX * gridSize;
-    worldPosition.fY = gridPosition.fY * gridSize;
+    // Update the world positions
+    tileTopLeft.fX = gridPosition.fX * gridSize;
+    tileTopLeft.fY = gridPosition.fY * gridSize;
+    tileCenter.fX = tileTopLeft.fX + gridSize / 2;
+    tileCenter.fY = tileTopLeft.fY + gridSize / 2;
+    tileBottomRight.fX = tileTopLeft.fX + gridSize;
+    tileBottomRight.fY = tileTopLeft.fY + gridSize;
+
     // Update current tile ID and return false if it detects end of string.
     continueParsing = updateTileID();
     if (!continueParsing) {
@@ -138,12 +147,21 @@ public:
 void loadMapData(const orxSTRING mapName) {
   if (mapName != orxNULL) {
     MapParser parser(mapName);
-    orxOBJECT *map = orxObject_CreateFromConfig(mapName);
+    const orxOBJECT *map = orxObject_CreateFromConfig(mapName);
+    const orxSTRING bodyName = orxConfig_GetString("BodyDef");
+    orxBODY *body = orxBody_CreateFromConfig((const orxSTRUCTURE *)map, bodyName);
+
     while (parser.nextTile()) {
       if (parser.tileSection == orxNULL) continue;
-      // orxSTRING tileBody = orxConfig_
+      orxConfig_PushSection(parser.tileSection);
+      if (orxString_Compare(orxConfig_GetString("Type"), "box") == 0) {
+        orxConfig_SetVector("TopLeft", &parser.tileTopLeft);
+        orxConfig_SetVector("BottomRight", &parser.tileBottomRight);
+      }
+      orxConfig_PopSection();
+      orxBody_AddPartFromConfig(body, parser.tileSection);
       orxOBJECT *object = orxObject_CreateFromConfig(parser.tileSection);
-      orxObject_SetPosition(object, &parser.worldPosition);
+      orxObject_SetPosition(object, &parser.tileTopLeft);
       // orxLOG("Pos<%f,%f,%f> %s", parser.gridPosition.fX, parser.gridPosition.fY, parser.gridPosition.fZ, parser.tileSection);
     }
   }
