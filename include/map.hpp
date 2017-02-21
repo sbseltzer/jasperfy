@@ -176,6 +176,33 @@ void map_AddPhysicsForTile(const orxSTRING _zTileName, orxBODY *_pstWorldBody, o
   orxConfig_PopSection();
 }
 
+typedef struct MapObjectParser {
+  const orxSTRING zMapName;
+  orxU32 u32KeyIndex;
+} MapObjectParser;
+
+MapObjectParser map_CreateObjectParser(const orxSTRING _zMapName) {
+  return (MapObjectParser) {_zMapName, 0};
+}
+
+orxSTATUS map_NextObjectListPosition(MapObjectParser *_pstParser, const orxSTRING *_zKeyOut, orxVECTOR *vPositionOut) {
+  orxSTATUS status = orxSTATUS_FAILURE;
+  orxConfig_PushSection(_pstParser->zMapName);
+  orxVector_Set(vPositionOut, 0, 0, 0);
+  const orxU32 u32KeyCount = orxConfig_GetKeyCounter();
+  while ((_pstParser->u32KeyIndex < u32KeyCount)) {
+    const orxSTRING zKeyName = orxConfig_GetKey(_pstParser->u32KeyIndex);
+    _pstParser->u32KeyIndex++;
+    if (orxString_ToVector(zKeyName, vPositionOut, orxNULL) == orxSTATUS_SUCCESS) {
+      *_zKeyOut = zKeyName;
+      status = orxSTATUS_SUCCESS;
+      break;
+    }
+  }
+  orxConfig_PopSection();
+  return status;
+}
+
 // Implementation of map generation
 void loadMapData(const orxSTRING mapName) {
   if (mapName != orxNULL) {
@@ -187,7 +214,22 @@ void loadMapData(const orxSTRING mapName) {
       map_AddPhysicsForTile(parser.tileSection, body, parser.getGridSize(), &parser.tileTopLeft);
       orxOBJECT *object = orxObject_CreateFromConfig(parser.tileSection);
       orxObject_SetPosition(object, &parser.tileTopLeft);
-      // orxLOG("Pos<%f,%f,%f> %s", parserData.gridPosition.fX, parserData.gridPosition.fY, parserData.gridPosition.fZ, parserData._zTileName);
+    }
+    MapObjectParser objectParser = map_CreateObjectParser(mapName);
+    orxVECTOR objectPos = {0};
+    const orxSTRING objectListKey;
+    while (map_NextObjectListPosition(&objectParser, &objectListKey, &objectPos) != orxSTATUS_FAILURE) {
+      orxVector_Mulf(&objectPos, &objectPos, parser.getGridSize());
+      orxConfig_PushSection(objectParser.zMapName);
+      orxS32 numObjects = orxConfig_GetListCounter(objectListKey);
+      for (orxS32 i = 0; i < numObjects; i++) {
+        const orxSTRING objectListValue = orxConfig_GetListString(objectListKey, i);
+        if (orxConfig_HasSection(objectListValue)) {
+          orxOBJECT *object = orxObject_CreateFromConfig(objectListValue);
+          orxObject_SetPosition(object, &objectPos);
+        }
+      }
+      orxConfig_PopSection();
     }
   }
 }
