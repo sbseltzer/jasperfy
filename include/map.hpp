@@ -6,6 +6,12 @@ static const orxU32 MAP_MIN_GRIDSIZE = 1;
 /*! Minimum grid size for processing physics */
 static const orxU32 MAP_MIN_GRIDSIZE_PHYSICS = 8;
 
+orxTEXTURE* map_PackTextures(const orxHASHTABLE *_pstTileTable) {
+  orxTEXTURE *pstTexture;
+  orxBITMAP *pstBitmap;
+  return pstTexture;
+}
+
 /*! Load the specified section into a hashtable */
 orxHASHTABLE* map_LoadTileTable(const orxSTRING _zName) {
   orxU32 numKeys;
@@ -28,6 +34,7 @@ orxHASHTABLE* map_LoadTileTable(const orxSTRING _zName) {
     }
   }
   orxConfig_PopSection();
+  orxHashTable_Optimize(pstTileTable);
   return pstTileTable;
 }
 
