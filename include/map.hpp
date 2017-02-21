@@ -169,6 +169,32 @@ void map_AddPhysicsForTile(const orxSTRING _zTileName, orxBODY *_pstWorldBody, o
   orxConfig_PopSection();
 }
 
+typedef struct MapObjectParser {
+  const orxSTRING zMapName;
+  orxU32 u32KeyIndex;
+} MapObjectParser;
+
+MapObjectParser map_CreateObjectParser(const orxSTRING _zMapName) {
+  return (MapObjectParser) {_zMapName, 0};
+}
+
+orxSTATUS map_NextObjectListPosition(MapObjectParser *_pstParser, const orxSTRING *_zKeyOut, orxVECTOR *vPositionOut) {
+  orxSTATUS status = orxSTATUS_FAILURE;
+  orxConfig_PushSection(_pstParser->zMapName);
+  const orxU32 u32KeyCount = orxConfig_GetKeyCounter();
+  while ((_pstParser->u32KeyIndex < u32KeyCount)) {
+    const orxSTRING zKeyName = orxConfig_GetKey(_pstParser->u32KeyIndex);
+    _pstParser->u32KeyIndex++;
+    if (orxString_ToVector(zKeyName, vPositionOut, orxNULL) == orxSTATUS_SUCCESS) {
+      *_zKeyOut = zKeyName;
+      status = orxSTATUS_SUCCESS;
+      break;
+    }
+  }
+  orxConfig_PopSection();
+  return status;
+}
+
 // Implementation of map generation
 void loadMapData(const orxSTRING mapName) {
   if (mapName != orxNULL) {
@@ -181,6 +207,14 @@ void loadMapData(const orxSTRING mapName) {
       orxOBJECT *object = orxObject_CreateFromConfig(parser.tileSection);
       orxObject_SetPosition(object, &parser.tileTopLeft);
       // orxLOG("Pos<%f,%f,%f> %s", parserData.gridPosition.fX, parserData.gridPosition.fY, parserData.gridPosition.fZ, parserData._zTileName);
+    }
+    MapObjectParser objectParser = map_CreateObjectParser(mapName);
+    orxVECTOR objectPos = {0};
+    orxBOOL done = orxFALSE;
+    while (!done) {
+      const orxSTRING objectListKey;
+      done = map_NextObjectListPosition(&objectParser, &objectListKey, &objectPos) == orxSTATUS_FAILURE;
+      orxLOG("Discovered object(s) for postition %s", objectListKey, objectParser.u32KeyIndex);
     }
   }
 }
