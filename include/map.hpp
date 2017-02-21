@@ -181,11 +181,13 @@ MapObjectParser map_CreateObjectParser(const orxSTRING _zMapName) {
 orxSTATUS map_NextObjectListPosition(MapObjectParser *_pstParser, const orxSTRING *_zKeyOut, orxVECTOR *vPositionOut) {
   orxSTATUS status = orxSTATUS_FAILURE;
   orxConfig_PushSection(_pstParser->zMapName);
+  orxVector_Set(vPositionOut, 0, 0, 0);
   const orxU32 u32KeyCount = orxConfig_GetKeyCounter();
   while ((_pstParser->u32KeyIndex < u32KeyCount)) {
     const orxSTRING zKeyName = orxConfig_GetKey(_pstParser->u32KeyIndex);
     _pstParser->u32KeyIndex++;
     if (orxString_ToVector(zKeyName, vPositionOut, orxNULL) == orxSTATUS_SUCCESS) {
+      orxLOG("On key %d (%s)", _pstParser->u32KeyIndex, zKeyName);
       *_zKeyOut = zKeyName;
       status = orxSTATUS_SUCCESS;
       break;
@@ -210,11 +212,20 @@ void loadMapData(const orxSTRING mapName) {
     }
     MapObjectParser objectParser = map_CreateObjectParser(mapName);
     orxVECTOR objectPos = {0};
-    orxBOOL done = orxFALSE;
-    while (!done) {
-      const orxSTRING objectListKey;
-      done = map_NextObjectListPosition(&objectParser, &objectListKey, &objectPos) == orxSTATUS_FAILURE;
-      orxLOG("Discovered object(s) for postition %s", objectListKey, objectParser.u32KeyIndex);
+    const orxSTRING objectListKey;
+    while (map_NextObjectListPosition(&objectParser, &objectListKey, &objectPos) != orxSTATUS_FAILURE) {
+      orxVector_Mulf(&objectPos, &objectPos, parser.getGridSize());
+      orxConfig_PushSection(objectParser.zMapName);
+      orxS32 numObjects = orxConfig_GetListCounter(objectListKey);
+      for (orxS32 i = 0; i < numObjects; i++) {
+        const orxSTRING objectListValue = orxConfig_GetListString(objectListKey, i);
+        if (orxConfig_HasSection(objectListValue)) {
+          orxLOG("Creating object[%d] for postition %s = %s", i, objectListKey, objectListValue);
+          orxOBJECT *object = orxObject_CreateFromConfig(objectListValue);
+          orxObject_SetPosition(object, &objectPos);
+        }
+      }
+      orxConfig_PopSection();
     }
   }
 }
