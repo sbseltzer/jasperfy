@@ -141,32 +141,38 @@ public:
   }
 };
 
+void map_AddPhysicsForTile(const orxSTRING _zTileName, orxBODY *_pstWorldBody, orxVECTOR *_vTopLeft, orxVECTOR *_vBottomRight, orxVECTOR *_vCenter) {
+  const orxSTRING zPartType;
+  orxASSERT(_zTileName);
+  orxASSERT(_pstWorldBody);
+  orxConfig_PushSection(_zTileName);
+  zPartType = orxConfig_GetString("Type");
+  if (orxString_Compare(zPartType, "") != 0) {
+    if (orxString_Compare(zPartType, "box") == 0) {
+      orxConfig_SetVector("TopLeft", _vTopLeft);
+      orxConfig_SetVector("BottomRight", _vBottomRight);
+    } else if (orxString_Compare(zPartType, "sphere") == 0) {
+      orxConfig_SetVector("Center", _vCenter);
+    } else if (orxString_Compare(zPartType, "mesh") == 0) {
+      orxLOG("Mesh type unsupported: %s", _zTileName);
+    }
+    orxBody_AddPartFromConfig(_pstWorldBody, _zTileName);
+  }
+  orxConfig_PopSection();
+}
+
 // Implementation of map generation
 void loadMapData(const orxSTRING mapName) {
   if (mapName != orxNULL) {
     MapParser parser(mapName);
     const orxOBJECT *map = orxObject_CreateFromConfig(mapName);
     orxBODY *body = orxOBJECT_GET_STRUCTURE(map, BODY);
-
     while (parser.nextTile()) {
       if (parser.tileSection == orxNULL) continue;
-      orxConfig_PushSection(parser.tileSection);
-      const orxSTRING partType = orxConfig_GetString("Type");
-      if (orxString_Compare(partType, "") != 0) {
-        if (orxString_Compare(partType, "box") == 0) {
-          orxConfig_SetVector("TopLeft", &parser.tileTopLeft);
-          orxConfig_SetVector("BottomRight", &parser.tileBottomRight);
-        } else if (orxString_Compare(partType, "sphere") == 0) {
-          orxConfig_SetVector("Center", &parser.tileCenter);
-        } else if (orxString_Compare(partType, "mesh") == 0) {
-          orxLOG("Mesh type unsupported: %s", parser.tileSection);
-        }
-        orxBody_AddPartFromConfig(body, parser.tileSection);
-      }
-      orxConfig_PopSection();
+      map_AddPhysicsForTile(parser.tileSection, body, &parser.tileTopLeft, &parser.tileBottomRight, &parser.tileCenter);
       orxOBJECT *object = orxObject_CreateFromConfig(parser.tileSection);
       orxObject_SetPosition(object, &parser.tileTopLeft);
-      // orxLOG("Pos<%f,%f,%f> %s", parser.gridPosition.fX, parser.gridPosition.fY, parser.gridPosition.fZ, parser.tileSection);
+      // orxLOG("Pos<%f,%f,%f> %s", parserData.gridPosition.fX, parserData.gridPosition.fY, parserData.gridPosition.fZ, parserData._zTileName);
     }
   }
 }
