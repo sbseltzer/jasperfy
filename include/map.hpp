@@ -1,6 +1,11 @@
 #include <orx.h>
 #include <string>
 
+/*! Absolute minimum grid size */
+static const orxU32 MAP_MIN_GRIDSIZE = 1;
+/*! Minimum grid size for processing physics */
+static const orxU32 MAP_MIN_GRIDSIZE_PHYSICS = 8;
+
 /*! Load the specified section into a hashtable */
 orxHASHTABLE* map_LoadTileTable(const orxSTRING _zName) {
   orxU32 numKeys;
@@ -31,8 +36,6 @@ struct MapParser {
 public:
   orxVECTOR gridPosition;
   orxVECTOR tileTopLeft;
-  orxVECTOR tileCenter;
-  orxVECTOR tileBottomRight;
   orxSTRING tileSection;
 
 private:
@@ -89,8 +92,6 @@ private:
     index = 0;
     orxVector_Set(&gridPosition, 0.0, 0.0, 0.0);
     orxVector_Set(&tileTopLeft, 0.0, 0.0, 0.0);
-    orxVector_Set(&tileCenter, 0.0, 0.0, 0.0);
-    orxVector_Set(&tileBottomRight, 0.0, 0.0, 0.0);
     tileSection = (orxSTRING) orxNULL;
 
     readConfig(mapName);
@@ -112,6 +113,9 @@ public:
     Setup();
   }
 
+  orxU32 getGridSize() {
+    return gridSize;
+  }
   orxBOOL nextTile() {
     // orxLOG("Parsing next tile");
     // Skip whitespace, keeping a count of linebreaks along the way.
@@ -127,10 +131,6 @@ public:
     // Update the world positions
     tileTopLeft.fX = gridPosition.fX * gridSize;
     tileTopLeft.fY = gridPosition.fY * gridSize;
-    tileCenter.fX = tileTopLeft.fX + gridSize / 2;
-    tileCenter.fY = tileTopLeft.fY + gridSize / 2;
-    tileBottomRight.fX = tileTopLeft.fX + gridSize;
-    tileBottomRight.fY = tileTopLeft.fY + gridSize;
 
     // Update current tile ID and return false if it detects end of string.
     continueParsing = updateTileID();
@@ -141,8 +141,12 @@ public:
   }
 };
 
-void map_AddPhysicsForTile(const orxSTRING _zTileName, orxBODY *_pstWorldBody, orxVECTOR *_vTopLeft, orxVECTOR *_vBottomRight, orxVECTOR *_vCenter) {
+void map_AddPhysicsForTile(const orxSTRING _zTileName, orxBODY *_pstWorldBody, orxU32 u32GridSize, orxVECTOR *_vTopLeft) {
   const orxSTRING zPartType;
+  if (u32GridSize < MAP_MIN_GRIDSIZE_PHYSICS) {
+    orxLOG("WARNING: Attempted to add physics for tile with u32GridSize of %u (<= %u)! Doing so is unsafe. Skipping...", u32GridSize, MAP_MIN_GRIDSIZE_PHYSICS);
+    return;
+  }
   orxASSERT(_zTileName);
   orxASSERT(_pstWorldBody);
   orxConfig_PushSection(_zTileName);
@@ -150,9 +154,13 @@ void map_AddPhysicsForTile(const orxSTRING _zTileName, orxBODY *_pstWorldBody, o
   if (orxString_Compare(zPartType, "") != 0) {
     if (orxString_Compare(zPartType, "box") == 0) {
       orxConfig_SetVector("TopLeft", _vTopLeft);
-      orxConfig_SetVector("BottomRight", _vBottomRight);
+      orxVECTOR bottomRight = {0};
+      orxVector_Set(&bottomRight, _vTopLeft->fX + u32GridSize, _vTopLeft->fY + u32GridSize, 0);
+      orxConfig_SetVector("BottomRight", &bottomRight);
     } else if (orxString_Compare(zPartType, "sphere") == 0) {
-      orxConfig_SetVector("Center", _vCenter);
+      orxVECTOR center = {0};
+      orxVector_Set(&center, _vTopLeft->fX + u32GridSize / 2.0, _vTopLeft->fY + u32GridSize / 2.0, 0);
+      orxConfig_SetVector("BottomRight", &center);
     } else if (orxString_Compare(zPartType, "mesh") == 0) {
       orxLOG("Mesh type unsupported: %s", _zTileName);
     }
@@ -169,7 +177,7 @@ void loadMapData(const orxSTRING mapName) {
     orxBODY *body = orxOBJECT_GET_STRUCTURE(map, BODY);
     while (parser.nextTile()) {
       if (parser.tileSection == orxNULL) continue;
-      map_AddPhysicsForTile(parser.tileSection, body, &parser.tileTopLeft, &parser.tileBottomRight, &parser.tileCenter);
+      map_AddPhysicsForTile(parser.tileSection, body, parser.getGridSize(), &parser.tileTopLeft);
       orxOBJECT *object = orxObject_CreateFromConfig(parser.tileSection);
       orxObject_SetPosition(object, &parser.tileTopLeft);
       // orxLOG("Pos<%f,%f,%f> %s", parserData.gridPosition.fX, parserData.gridPosition.fY, parserData.gridPosition.fZ, parserData._zTileName);
