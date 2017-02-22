@@ -176,7 +176,7 @@ void map_AddPhysicsForTile(const orxSTRING _zTileName, orxBODY *_pstWorldBody, o
       orxConfig_SetVector("BottomRight", &bottomRight);
     } else if (orxString_Compare(zPartType, "sphere") == 0) {
       orxVECTOR center = {0};
-      orxVector_Set(&center, _vTopLeft->fX + u32GridSize / 2.0, _vTopLeft->fY + u32GridSize / 2.0, 0);
+      orxVector_Set(&center, _vTopLeft->fX + (orxFLOAT)u32GridSize / 2, _vTopLeft->fY + (orxFLOAT)u32GridSize / 2, 0);
       orxConfig_SetVector("BottomRight", &center);
     } else if (orxString_Compare(zPartType, "mesh") == 0) {
       orxLOG("Mesh type unsupported: %s", _zTileName);
@@ -229,7 +229,7 @@ void loadMapData(const orxSTRING mapName) {
     orxVECTOR objectPos = {0};
     const orxSTRING objectListKey;
     while (map_NextObjectListPosition(&objectParser, &objectListKey, &objectPos) != orxSTATUS_FAILURE) {
-      orxVector_Mulf(&objectPos, &objectPos, parser.getGridSize());
+      orxVector_Mulf(&objectPos, &objectPos, (orxFLOAT)parser.getGridSize());
       orxConfig_PushSection(objectParser.zMapName);
       orxS32 numObjects = orxConfig_GetListCounter(objectListKey);
       for (orxS32 i = 0; i < numObjects; i++) {
