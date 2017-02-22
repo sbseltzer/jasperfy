@@ -9,6 +9,16 @@ static const orxU32 MAP_MIN_GRIDSIZE_PHYSICS = 8;
 orxTEXTURE* map_PackTextures(const orxHASHTABLE *_pstTileTable) {
   orxTEXTURE *pstTexture;
   orxBITMAP *pstBitmap;
+  orxSTRING zTileAlias;
+  orxSTRING zTileName;
+  orxHANDLE iterator = orxHANDLE_UNDEFINED;
+  do {
+    iterator = orxHashTable_GetNext(_pstTileTable, iterator, (orxU64 *)&zTileAlias, (void **)&zTileName);
+    if (iterator) {
+      orxConfig_PushSection(zTileName);
+      orxConfig_PopSection();
+    }
+  } while (iterator);
   return pstTexture;
 }
 
