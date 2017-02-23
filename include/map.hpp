@@ -13,28 +13,47 @@ static orxLINKLIST sstMapList;
 /*!  */
 typedef struct MapData {
   orxLINKLIST_NODE stNode;
-  const orxSTRING zName;           /*! Section name of map */
-  orxSTRING zTileTableName;        /*! Section name to generate pstTileAliasTable */
-  orxSTRING zBodyName;             /*! Section name of the map's body definition */
+  const orxSTRING zMapName;        /*! Section name of map */
+  const orxSTRING zTileTableName;        /*! Section name to generate pstTileAliasTable */
+  const orxSTRING zBodyName;             /*! Section name of the map's body definition */
+  const orxSTRING zMapLayout;            /*! Map layout string to be parsed */
   orxVECTOR vGridUnitSize;         /*! The size of one grid unit */
   orxVECTOR vGridDimensions;       /*! The total size of the map in grid units */
-  orxSTRING zMapLayout;            /*! Map layout string to be parsed */
   orxHASHTABLE *pstTileNameTable;  /*! alias -> tile section name */
   orxHASHTABLE *pstTileIndexTable; /*! tile alias -> tile index */
   orxHASHTABLE *pstObjectPosTable; /*! position -> object list */
   orxBODY* pstBody;                /*! Body to add tile BodyParts to */
 } MapData;
 
-MapData *map_CreateMapData(orxSTRING _zName) {
+MapData *map_CreateMapData(orxSTRING _zMapName) {
   MapData *pstMap = orxNULL;
+
+  orxASSERT(_zMapName);
 
   pstMap = (MapData *)orxBank_Allocate(spstMapBank);
   orxASSERT(pstMap);
+
+  // known values
+  pstMap->zMapName = _zMapName;
+  orxConfig_PushSection(pstMap->zMapName);
+  pstMap->zTileTableName = orxConfig_GetString("Tiles");
+  pstMap->zBodyName = orxConfig_GetString("Body");
+  pstMap->zMapLayout = orxConfig_GetString("Map");
+  orxConfig_GetVector("GridSize", &pstMap->vGridUnitSize);
+  orxConfig_PopSection();
+
+  // unknowns
+  orxVector_Set(&pstMap->vGridDimensions, 0, 0, 0);
+  pstMap->pstBody = orxNULL;
+  pstMap->pstTileNameTable = orxNULL;
+  pstMap->pstTileIndexTable = orxNULL;
+  pstMap->pstObjectPosTable = orxNULL;
 
   orxLinkList_AddEnd(&sstMapList, (orxLINKLIST_NODE *)pstMap);
   return pstMap;
 }
 void map_DeleteMapData(MapData *_pstMap) {
+  orxASSERT(_pstMap);
   orxLinkList_Remove((orxLINKLIST_NODE *)_pstMap);
   orxBank_Free(spstMapBank, _pstMap);
 }
