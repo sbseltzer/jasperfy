@@ -80,7 +80,7 @@ orxSTATUS orxFASTCALL Init()
   pstClock = orxClock_FindFirst(orx2F(-1.0f), orxCLOCK_TYPE_CORE);
   orxClock_Register(pstClock, Update, orxNULL, orxMODULE_ID_MAIN, orxCLOCK_PRIORITY_NORMAL);
 
-  loadMapData("MyCoolMapLayer");
+  map_LoadMapData("MyCoolMapLayer");
 
   // Done!
   return eResult;
