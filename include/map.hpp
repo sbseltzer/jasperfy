@@ -8,7 +8,7 @@ static const orxU32 MAP_MIN_GRIDSIZE_PHYSICS = 8;
 
 /*! Map storage */
 static orxBANK *spstMapBank;
-static orxLINKLIST spstMapList;
+static orxLINKLIST sstMapList;
 
 /*!  */
 typedef struct MapData {
@@ -25,12 +25,13 @@ typedef struct MapData {
   orxBODY* pstBody;                /*! Body to add tile BodyParts to */
 } MapData;
 
-MapData *map_CreateMapData() {
+MapData *map_CreateMapData(orxSTRING _zName) {
   MapData *pstMap = orxNULL;
 
   pstMap = (MapData *)orxBank_Allocate(spstMapBank);
   orxASSERT(pstMap);
 
+  orxLinkList_AddEnd(&sstMapList, (orxLINKLIST_NODE *)pstMap);
   return pstMap;
 }
 void map_DeleteMapData(MapData *_pstMap) {
