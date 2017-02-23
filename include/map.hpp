@@ -12,11 +12,11 @@ static orxLINKLIST sstMapList;
 
 /*!  */
 typedef struct MapData {
-  orxLINKLIST_NODE stNode;
+  orxLINKLIST_NODE stNode;         /*! Mandatory for orxLINKLIST compatibility */
   const orxSTRING zMapName;        /*! Section name of map */
-  const orxSTRING zTileTableName;        /*! Section name to generate pstTileAliasTable */
-  const orxSTRING zBodyName;             /*! Section name of the map's body definition */
-  const orxSTRING zMapLayout;            /*! Map layout string to be parsed */
+  const orxSTRING zTileTableName;  /*! Section name to generate pstTileAliasTable */
+  const orxSTRING zBodyName;       /*! Section name of the map's body definition */
+  const orxSTRING zMapLayout;      /*! Map layout string to be parsed */
   orxVECTOR vGridUnitSize;         /*! The size of one grid unit */
   orxVECTOR vGridDimensions;       /*! The total size of the map in grid units */
   orxHASHTABLE *pstTileNameTable;  /*! alias -> tile section name */
@@ -50,6 +50,7 @@ MapData *map_CreateMapData(orxSTRING _zMapName) {
   pstMap->pstObjectPosTable = orxNULL;
 
   orxLinkList_AddEnd(&sstMapList, (orxLINKLIST_NODE *)pstMap);
+
   return pstMap;
 }
 void map_DeleteMapData(MapData *_pstMap) {
