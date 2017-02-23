@@ -65,6 +65,8 @@ orxSTATUS orxFASTCALL Init()
 
   orxCLOCK *pstClock;
 
+  map_Init();
+
   // Creates viewport
   orxViewport_CreateFromConfig("Viewport");
 
@@ -108,6 +110,7 @@ orxSTATUS orxFASTCALL Run()
 void orxFASTCALL Exit()
 {
   // We could delete everything we created here but orx will do it for us anyway =)
+  map_Exit();
 }
 
 int main(int argc, char **argv)

@@ -6,6 +6,29 @@ static const orxU32 MAP_MIN_GRIDSIZE = 1;
 /*! Minimum grid size for processing physics */
 static const orxU32 MAP_MIN_GRIDSIZE_PHYSICS = 8;
 
+
+orxSTATUS orxFASTCALL map_ConfigEventHandler(const orxEVENT *_pstEvent) {
+  orxSTATUS eResult = orxSTATUS_SUCCESS;
+
+  if (_pstEvent->eID == orxRESOURCE_EVENT_UPDATE) {
+    orxRESOURCE_EVENT_PAYLOAD *pstPayload = (orxRESOURCE_EVENT_PAYLOAD *)_pstEvent->pstPayload;
+    orxLOG("Update: %s", orxString_GetFromID(pstPayload->u32GroupID));
+  }
+  return eResult;
+}
+
+orxSTATUS map_Init() {
+  orxSTATUS result = orxSTATUS_SUCCESS;
+  orxEvent_AddHandler(orxEVENT_TYPE_RESOURCE, map_ConfigEventHandler);
+  return result;
+}
+
+orxSTATUS map_Exit() {
+  orxSTATUS result = orxSTATUS_SUCCESS;
+  orxEvent_RemoveHandler(orxEVENT_TYPE_RESOURCE, map_ConfigEventHandler);
+  return result;
+}
+
 /*! Load the specified section into a hashtable */
 orxHASHTABLE* map_LoadTileTable(const orxSTRING _zName) {
   orxU32 numKeys;
