@@ -6,22 +6,36 @@ static const orxU32 MAP_MIN_GRIDSIZE = 1;
 /*! Minimum grid size for processing physics */
 static const orxU32 MAP_MIN_GRIDSIZE_PHYSICS = 8;
 
-static orxLINKLIST *spstWatchList;
+/*! Map storage */
+static orxBANK *spstMapBank;
+static orxLINKLIST spstMapList;
 
-/*! Represents the a map data structure */
+/*!  */
 typedef struct MapData {
   orxLINKLIST_NODE stNode;
-  const orxSTRING zName; /*! section name of map */
-  orxSTRING zTileTableName; /*! section name to generate pstTileAliasTable */
-  orxSTRING zBodyName;
-  orxVECTOR vGridSize;
-  orxVECTOR vTotalSize;
-  orxSTRING zParserInput;
-  orxHASHTABLE *pstTileNameTable;       /*! alias -> tile section name */
-  orxHASHTABLE *pstTileIndexTable;      /*! tile alias -> tile index */
+  const orxSTRING zName;           /*! Section name of map */
+  orxSTRING zTileTableName;        /*! Section name to generate pstTileAliasTable */
+  orxSTRING zBodyName;             /*! Section name of the map's body definition */
+  orxVECTOR vGridUnitSize;         /*! The size of one grid unit */
+  orxVECTOR vGridDimensions;       /*! The total size of the map in grid units */
+  orxSTRING zMapLayout;            /*! Map layout string to be parsed */
+  orxHASHTABLE *pstTileNameTable;  /*! alias -> tile section name */
+  orxHASHTABLE *pstTileIndexTable; /*! tile alias -> tile index */
   orxHASHTABLE *pstObjectPosTable; /*! position -> object list */
-  orxBODY* pstBody;
+  orxBODY* pstBody;                /*! Body to add tile BodyParts to */
 } MapData;
+
+MapData *map_CreateMapData() {
+  MapData *pstMap = orxNULL;
+
+  pstMap = (MapData *)orxBank_Allocate(spstMapBank);
+  orxASSERT(pstMap);
+
+  return pstMap;
+}
+void map_DeleteMapData(MapData *_pstMap) {
+  orxBank_Free(spstMapBank, _pstMap);
+}
 
 orxSTATUS orxFASTCALL map_ConfigEventHandler(const orxEVENT *_pstEvent) {
   orxSTATUS eResult = orxSTATUS_SUCCESS;
@@ -35,12 +49,14 @@ orxSTATUS orxFASTCALL map_ConfigEventHandler(const orxEVENT *_pstEvent) {
 
 orxSTATUS map_Init() {
   orxSTATUS result = orxSTATUS_SUCCESS;
+  spstMapBank = orxBank_Create(32, sizeof(MapData), orxBANK_KU32_FLAG_NONE, orxMEMORY_TYPE_MAIN);
   orxEvent_AddHandler(orxEVENT_TYPE_RESOURCE, map_ConfigEventHandler);
   return result;
 }
 
 orxSTATUS map_Exit() {
   orxSTATUS result = orxSTATUS_SUCCESS;
+  orxBank_Delete(spstMapBank);
   orxEvent_RemoveHandler(orxEVENT_TYPE_RESOURCE, map_ConfigEventHandler);
   return result;
 }
