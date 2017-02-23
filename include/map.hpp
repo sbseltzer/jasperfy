@@ -252,7 +252,7 @@ orxSTATUS map_NextObjectListPosition(MapObjectParser *_pstParser, const orxSTRIN
 }
 
 // Implementation of map generation
-void map_loadMapData(const orxSTRING mapName) {
+void map_LoadMapData(const orxSTRING mapName) {
   if (mapName != orxNULL) {
     MapParser parser(mapName);
     const orxOBJECT *map = orxObject_CreateFromConfig(mapName);
