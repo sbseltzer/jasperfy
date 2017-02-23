@@ -6,16 +6,20 @@ static const orxU32 MAP_MIN_GRIDSIZE = 1;
 /*! Minimum grid size for processing physics */
 static const orxU32 MAP_MIN_GRIDSIZE_PHYSICS = 8;
 
-orxTEXTURE* map_PackTextures(const orxHASHTABLE *_pstTileTable) {
+orxTEXTURE* map_PackTextures(const orxHASHTABLE *_pstTileAliasTable) {
   orxTEXTURE *pstTexture;
   orxBITMAP *pstBitmap;
   orxSTRING zTileAlias;
   orxSTRING zTileName;
+  orxHASHTABLE *pstTileTextureTable;
   orxHANDLE iterator = orxHANDLE_UNDEFINED;
+  orxU32 u32TableSize = orxHashTable_GetCounter(_pstTileAliasTable);
+  pstTileTextureTable = orxHashTable_Create(u32TableSize, orxHASHTABLE_KU32_FLAG_NONE, orxMEMORY_TYPE_MAIN);
   do {
-    iterator = orxHashTable_GetNext(_pstTileTable, iterator, (orxU64 *)&zTileAlias, (void **)&zTileName);
+    iterator = orxHashTable_GetNext(_pstTileAliasTable, iterator, (orxU64 *)&zTileAlias, (void **)&zTileName);
     if (iterator) {
       orxConfig_PushSection(zTileName);
+      pstTexture = orxTexture_CreateFromFile(orxConfig_GetString("Texture"), orxFALSE);
       orxConfig_PopSection();
     }
   } while (iterator);
