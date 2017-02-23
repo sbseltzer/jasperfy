@@ -65,6 +65,14 @@ orxSTATUS orxFASTCALL map_ConfigEventHandler(const orxEVENT *_pstEvent) {
   if (_pstEvent->eID == orxRESOURCE_EVENT_UPDATE) {
     orxRESOURCE_EVENT_PAYLOAD *pstPayload = (orxRESOURCE_EVENT_PAYLOAD *)_pstEvent->pstPayload;
     orxLOG("Update: %s", orxString_GetFromID(pstPayload->u32NameID));
+    orxLINKLIST_NODE *pstNode = (orxLINKLIST_NODE *)sstMapList.pstFirst;
+    while (pstNode != orxNULL) {
+      MapData *pstMap = (MapData *)pstNode;
+      const orxU32 zOriginID = orxConfig_GetOriginID(pstMap->zMapName);
+      if (zOriginID == pstPayload->u32NameID)
+        orxLOG("Hit!");
+      pstNode = orxLinkList_GetNext(pstNode);
+    }
   }
   return eResult;
 }
