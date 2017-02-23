@@ -6,13 +6,29 @@ static const orxU32 MAP_MIN_GRIDSIZE = 1;
 /*! Minimum grid size for processing physics */
 static const orxU32 MAP_MIN_GRIDSIZE_PHYSICS = 8;
 
+static orxLINKLIST *spstWatchList;
+
+/*! Represents the a map data structure */
+typedef struct MapData {
+  orxLINKLIST_NODE stNode;
+  const orxSTRING zName; /*! section name of map */
+  orxSTRING zTileTableName; /*! section name to generate pstTileAliasTable */
+  orxSTRING zBodyName;
+  orxVECTOR vGridSize;
+  orxVECTOR vTotalSize;
+  orxSTRING zParserInput;
+  orxHASHTABLE *pstTileNameTable;       /*! alias -> tile section name */
+  orxHASHTABLE *pstTileIndexTable;      /*! tile alias -> tile index */
+  orxHASHTABLE *pstObjectPosTable; /*! position -> object list */
+  orxBODY* pstBody;
+} MapData;
 
 orxSTATUS orxFASTCALL map_ConfigEventHandler(const orxEVENT *_pstEvent) {
   orxSTATUS eResult = orxSTATUS_SUCCESS;
 
   if (_pstEvent->eID == orxRESOURCE_EVENT_UPDATE) {
     orxRESOURCE_EVENT_PAYLOAD *pstPayload = (orxRESOURCE_EVENT_PAYLOAD *)_pstEvent->pstPayload;
-    orxLOG("Update: %s", orxString_GetFromID(pstPayload->u32GroupID));
+    orxLOG("Update: %s", orxString_GetFromID(pstPayload->u32NameID));
   }
   return eResult;
 }
