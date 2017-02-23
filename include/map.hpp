@@ -175,7 +175,7 @@ typedef struct MapObjectParser {
 } MapObjectParser;
 
 MapObjectParser map_CreateObjectParser(const orxSTRING _zMapName) {
-  return (MapObjectParser) {_zMapName, 0};
+  return {_zMapName, 0};
 }
 
 orxSTATUS map_NextObjectListPosition(MapObjectParser *_pstParser, const orxSTRING *_zKeyOut, orxVECTOR *vPositionOut) {
