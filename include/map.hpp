@@ -35,6 +35,7 @@ MapData *map_CreateMapData(orxSTRING _zName) {
   return pstMap;
 }
 void map_DeleteMapData(MapData *_pstMap) {
+  orxLinkList_Remove((orxLINKLIST_NODE *)_pstMap);
   orxBank_Free(spstMapBank, _pstMap);
 }
 
