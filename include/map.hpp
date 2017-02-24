@@ -14,81 +14,20 @@ static orxLINKLIST sstMapList;
 typedef struct MapData {
   orxLINKLIST_NODE stNode;         /*! Mandatory for orxLINKLIST compatibility */
   const orxSTRING zMapName;        /*! Section name of map */
-  const orxSTRING zTileTableName;  /*! Section name to generate pstTileAliasTable */
+  const orxSTRING zTileAliasTableName;  /*! Section name to generate pstTileAliasTable */
   const orxSTRING zBodyName;       /*! Section name of the map's body definition */
   const orxSTRING zMapLayout;      /*! Map layout string to be parsed */
   orxVECTOR vGridUnitSize;         /*! The size of one grid unit */
   orxVECTOR vGridDimensions;       /*! The total size of the map in grid units */
-  orxHASHTABLE *pstTileNameTable;  /*! alias -> tile section name */
+  orxHASHTABLE *pstTileAliasTable;  /*! alias -> tile section name */
   orxHASHTABLE *pstTileIndexTable; /*! tile alias -> tile index */
   orxHASHTABLE *pstObjectPosTable; /*! position -> object list */
   orxBODY* pstBody;                /*! Body to add tile BodyParts to */
 } MapData;
 
-MapData *map_CreateMapData(orxSTRING _zMapName) {
-  MapData *pstMap = orxNULL;
-
-  orxASSERT(_zMapName);
-
-  pstMap = (MapData *)orxBank_Allocate(spstMapBank);
-  orxASSERT(pstMap);
-
-  // known values
-  pstMap->zMapName = _zMapName;
-  orxConfig_PushSection(pstMap->zMapName);
-  pstMap->zTileTableName = orxConfig_GetString("Tiles");
-  pstMap->zBodyName = orxConfig_GetString("Body");
-  pstMap->zMapLayout = orxConfig_GetString("Map");
-  orxConfig_GetVector("GridSize", &pstMap->vGridUnitSize);
-  orxConfig_PopSection();
-
-  // unknowns
-  orxVector_Set(&pstMap->vGridDimensions, 0, 0, 0);
-  pstMap->pstBody = orxNULL;
-  pstMap->pstTileNameTable = orxNULL;
-  pstMap->pstTileIndexTable = orxNULL;
-  pstMap->pstObjectPosTable = orxNULL;
-
-  orxLinkList_AddEnd(&sstMapList, (orxLINKLIST_NODE *)pstMap);
-
-  return pstMap;
-}
-void map_DeleteMapData(MapData *_pstMap) {
-  orxASSERT(_pstMap);
-  orxLinkList_Remove((orxLINKLIST_NODE *)_pstMap);
-  orxBank_Free(spstMapBank, _pstMap);
-}
-
-orxSTATUS orxFASTCALL map_ConfigEventHandler(const orxEVENT *_pstEvent) {
-  orxSTATUS eResult = orxSTATUS_SUCCESS;
-
-  if (_pstEvent->eID == orxRESOURCE_EVENT_UPDATE) {
-    orxRESOURCE_EVENT_PAYLOAD *pstPayload = (orxRESOURCE_EVENT_PAYLOAD *)_pstEvent->pstPayload;
-    orxLOG("Update: %s", orxString_GetFromID(pstPayload->u32NameID));
-    orxLINKLIST_NODE *pstNode = (orxLINKLIST_NODE *)sstMapList.pstFirst;
-    while (pstNode != orxNULL) {
-      MapData *pstMap = (MapData *)pstNode;
-      const orxU32 zOriginID = orxConfig_GetOriginID(pstMap->zMapName);
-      if (zOriginID == pstPayload->u32NameID)
-        orxLOG("Hit!");
-      pstNode = orxLinkList_GetNext(pstNode);
-    }
-  }
-  return eResult;
-}
-
-orxSTATUS map_Init() {
-  orxSTATUS result = orxSTATUS_SUCCESS;
-  spstMapBank = orxBank_Create(32, sizeof(MapData), orxBANK_KU32_FLAG_NONE, orxMEMORY_TYPE_MAIN);
-  orxEvent_AddHandler(orxEVENT_TYPE_RESOURCE, map_ConfigEventHandler);
-  return result;
-}
-
-orxSTATUS map_Exit() {
-  orxSTATUS result = orxSTATUS_SUCCESS;
-  orxBank_Delete(spstMapBank);
-  orxEvent_RemoveHandler(orxEVENT_TYPE_RESOURCE, map_ConfigEventHandler);
-  return result;
+orxU64 map_HasChanged(MapData* _pstMap) {
+  // My thought was to generate a hash of the map and all its dependencies, but I'm realizing that could explode in calculation time. It also would require re-checking all data related to all maps.
+  // I'd need to check the tile table name, the body name, the map layout, the contents of the tile table, the contents of the body, the grid size, and the object table
 }
 
 /*! Load the specified section into a hashtable */
@@ -115,6 +54,84 @@ orxHASHTABLE* map_LoadTileTable(const orxSTRING _zName) {
   orxConfig_PopSection();
   return pstTileTable;
 }
+
+MapData *map_CreateMapData(const orxSTRING _zMapName) {
+  MapData *pstMap = orxNULL;
+
+  orxASSERT(_zMapName);
+
+  pstMap = (MapData *)orxBank_Allocate(spstMapBank);
+  orxASSERT(pstMap);
+
+  // known values
+  pstMap->zMapName = _zMapName;
+  orxConfig_PushSection(pstMap->zMapName);
+  pstMap->zTileAliasTableName = orxConfig_GetString("Tiles");
+  pstMap->zBodyName = orxConfig_GetString("Body");
+  pstMap->zMapLayout = orxConfig_GetString("Map");
+  orxConfig_GetVector("GridSize", &pstMap->vGridUnitSize);
+  orxConfig_PopSection();
+
+  // unknowns
+  orxVector_Set(&pstMap->vGridDimensions, 0, 0, 0);
+  pstMap->pstBody = orxNULL;
+  pstMap->pstTileAliasTable = orxNULL;
+  pstMap->pstTileIndexTable = orxNULL;
+  pstMap->pstObjectPosTable = orxNULL;
+
+  orxLinkList_AddEnd(&sstMapList, (orxLINKLIST_NODE *)pstMap);
+
+  pstMap->pstTileAliasTable = map_LoadTileTable(pstMap->zTileAliasTableName);
+
+  return pstMap;
+}
+
+void map_DeleteMapData(MapData *_pstMap) {
+  orxASSERT(_pstMap);
+  orxLinkList_Remove((orxLINKLIST_NODE *)_pstMap);
+  orxBank_Free(spstMapBank, _pstMap);
+}
+
+void map_Reload(MapData *_pstMap) {
+  const orxSTRING zMapName = _pstMap->zMapName;
+  map_DeleteMapData(_pstMap);
+  *_pstMap = *(map_CreateMapData(zMapName));
+  // return _pstMap;
+}
+
+orxSTATUS orxFASTCALL map_ConfigEventHandler(const orxEVENT *_pstEvent) {
+  orxSTATUS eResult = orxSTATUS_SUCCESS;
+
+  if (_pstEvent->eID == orxRESOURCE_EVENT_UPDATE) {
+    orxRESOURCE_EVENT_PAYLOAD *pstPayload = (orxRESOURCE_EVENT_PAYLOAD *)_pstEvent->pstPayload;
+    orxLOG("Update: %s", orxString_GetFromID(pstPayload->u32NameID));
+    orxLINKLIST_NODE *pstNode = (orxLINKLIST_NODE *)sstMapList.pstFirst;
+    while (pstNode != orxNULL) {
+      MapData *pstMap = (MapData *)pstNode;
+      const orxU32 zOriginID = orxConfig_GetOriginID(pstMap->zMapName);
+      if (zOriginID == pstPayload->u32NameID) {
+        map_Reload(pstMap);
+      }
+      pstNode = orxLinkList_GetNext(pstNode);
+    }
+  }
+  return eResult;
+}
+
+orxSTATUS map_Init() {
+  orxSTATUS result = orxSTATUS_SUCCESS;
+  spstMapBank = orxBank_Create(32, sizeof(MapData), orxBANK_KU32_FLAG_NONE, orxMEMORY_TYPE_MAIN);
+  orxEvent_AddHandler(orxEVENT_TYPE_RESOURCE, map_ConfigEventHandler);
+  return result;
+}
+
+orxSTATUS map_Exit() {
+  orxSTATUS result = orxSTATUS_SUCCESS;
+  orxBank_Delete(spstMapBank);
+  orxEvent_RemoveHandler(orxEVENT_TYPE_RESOURCE, map_ConfigEventHandler);
+  return result;
+}
+
 
 struct MapParser {
 
