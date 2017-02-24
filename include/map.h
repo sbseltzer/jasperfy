@@ -4,28 +4,30 @@
 static const orxU32 MAP_MIN_GRIDSIZE = 1;
 /*! Minimum grid size for processing physics */
 static const orxU32 MAP_MIN_GRIDSIZE_PHYSICS = 8;
-static const orxU32 MAP_MAX_ALIAS_LENGTH = 64;
+/*! Max length of tile aliases */
+static const orxU32 MAP_MAX_TILE_ALIAS_LENGTH = 64;
 
 /*! Map storage */
 static orxBANK *spstMapBank;
 static orxLINKLIST sstMapList;
 
-/*!  */
+/*! Map */
 typedef struct MapData {
-  orxLINKLIST_NODE stNode;         /*! Mandatory for orxLINKLIST compatibility */
-  const orxSTRING zMapName;        /*! Section name of map */
-  const orxSTRING zTileAliasTableName;  /*! Section name to generate pstTileAliasTable */
-  const orxSTRING zBodyName;       /*! Section name of the map's body definition */
-  const orxSTRING zMapLayout;      /*! Map layout string to be parsed */
-  orxVECTOR vGridUnitSize;         /*! The size of one grid unit */
-  orxVECTOR vGridDimensions;       /*! The total size of the map in grid units */
-  orxHASHTABLE *pstTileAliasTable;  /*! alias -> tile section name */
-  orxHASHTABLE *pstTileIndexTable; /*! tile alias -> tile index */
-  orxHASHTABLE *pstObjectPosTable; /*! position -> object list */
-  orxOBJECT *pstObject;
-  orxBODY *pstBody;                /*! Body to add tile BodyParts to */
+  orxLINKLIST_NODE stNode;             /*! Mandatory for orxLINKLIST compatibility */
+  const orxSTRING zMapName;            /*! Section name of map */
+  const orxSTRING zTileAliasTableName; /*! Section name to generate pstTileAliasTable */
+  const orxSTRING zBodyName;           /*! Section name of the map's body definition */
+  const orxSTRING zMapLayout;          /*! Map layout string to be parsed */
+  orxVECTOR vGridUnitSize;             /*! The size of one grid unit */
+  orxVECTOR vGridDimensions;           /*! The total size of the map in grid units */
+  orxHASHTABLE *pstTileAliasTable;     /*! tile alias -> tile section name */
+  orxHASHTABLE *pstTileIndexTable;     /*! tile alias -> tile index */
+  orxHASHTABLE *pstObjectPosTable;     /*! position -> object list */
+  orxOBJECT *pstObject;                /*! Object created from zMapName for lifetime management */
+  orxBODY *pstBody;                    /*! Body to add tile BodyParts to */
 } MapData;
 
+/*! Map layout parsing state */
 typedef struct MapLayoutParser {
   const MapData *pstMap;
   const orxU32 u32Length;
@@ -66,8 +68,8 @@ static orxBOOL map_ParseLayoutTile(MapLayoutParser *pstParser) {
     ch = pstParser->pstMap->zMapLayout[++pstParser->u32Index];
   }
   orxU32 u32SubLength = pstParser->u32Index - u32StartIndex;
-  orxASSERT(u32SubLength < MAP_MAX_ALIAS_LENGTH);
-  orxCHAR zTileAlias[MAP_MAX_ALIAS_LENGTH];
+  orxASSERT(u32SubLength < MAP_MAX_TILE_ALIAS_LENGTH);
+  orxCHAR zTileAlias[MAP_MAX_TILE_ALIAS_LENGTH];
   strncpy(zTileAlias, pstParser->pstMap->zMapLayout + u32StartIndex, u32SubLength);
   zTileAlias[u32SubLength] = '\0';
   pstParser->zCurrentTileName = (orxSTRING)orxHashTable_Get(pstParser->pstMap->pstTileAliasTable, (orxU64)orxString_GetID(zTileAlias));
