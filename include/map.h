@@ -1,5 +1,9 @@
 #include <orx.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /*! Map */
 typedef struct MapData {
   orxLINKLIST_NODE stNode;             /*! Mandatory for orxLINKLIST compatibility */
@@ -67,3 +71,8 @@ orxSTATUS map_Exit();
 
 // Implementation of map generation
 void map_LoadMapData(const orxSTRING mapName);
+
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
