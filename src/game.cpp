@@ -1,6 +1,6 @@
 //! Includes
 #include "game.h"
-#include "map.hpp"
+#include "map.h"
 
 //! Variables
 orxOBJECT* pstScene;
