@@ -1,5 +1,4 @@
 #include <orx.h>
-#include <string>
 
 /*! Absolute minimum grid size */
 static const orxU32 MAP_MIN_GRIDSIZE = 1;
