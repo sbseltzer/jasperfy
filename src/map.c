@@ -1,11 +1,11 @@
 #include <map.h>
 
 /*! Absolute minimum grid size */
-static const orxU32 MAP_MIN_GRIDSIZE = 1;
+#define MAP_MIN_GRIDSIZE 1
 /*! Minimum grid size for processing physics */
-static const orxU32 MAP_MIN_GRIDSIZE_PHYSICS = 8;
+#define MAP_MIN_GRIDSIZE_PHYSICS 8
 /*! Max length of tile aliases */
-static const orxU32 MAP_MAX_TILE_ALIAS_LENGTH = 64;
+#define MAP_MAX_TILE_ALIAS_LENGTH 64
 
 /*! Map storage */
 static orxBANK *spstMapBank;
@@ -41,7 +41,7 @@ static orxBOOL map_ParseLayoutTile(MapLayoutParser *pstParser) {
   orxU32 u32SubLength = pstParser->u32Index - u32StartIndex;
   orxASSERT(u32SubLength < MAP_MAX_TILE_ALIAS_LENGTH);
   orxCHAR zTileAlias[MAP_MAX_TILE_ALIAS_LENGTH];
-  strncpy(zTileAlias, pstParser->pstMap->zMapLayout + u32StartIndex, u32SubLength);
+  memcpy(zTileAlias, pstParser->pstMap->zMapLayout + u32StartIndex, u32SubLength);
   zTileAlias[u32SubLength] = '\0';
   pstParser->zCurrentTileName = (orxSTRING)orxHashTable_Get(pstParser->pstMap->pstTileAliasTable, (orxU64)orxString_GetID(zTileAlias));
   // orxLOG("tileID is substring from %u to %u: %s %s", u32StartIndex, pstParser->u32Index, zTileAlias, pstParser->zCurrentTileName);
