@@ -9,6 +9,7 @@
 
 /*! Map storage */
 static orxBANK *spstMapBank;
+static orxBANK *spstTileSetBank;
 static orxLINKLIST sstMapList;
 
 MapLayoutParser map_CreateLayoutParser(const MapData* pstMap) {
@@ -180,6 +181,7 @@ MapData *map_CreateMapData(const orxSTRING _zMapName) {
   pstMap->pstBody = orxNULL;
   pstMap->pstTileAliasTable = orxNULL;
   pstMap->pstTileIndexTable = orxNULL;
+  pstMap->pstTileSetsTable = orxNULL;
   pstMap->pstObjectPosTable = orxNULL;
 
   orxLinkList_AddEnd(&sstMapList, (orxLINKLIST_NODE *)pstMap);

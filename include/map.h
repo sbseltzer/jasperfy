@@ -16,6 +16,7 @@ typedef struct MapData {
   orxHASHTABLE *pstTileAliasTable;     /*! tile alias -> tile section name */
   orxHASHTABLE *pstTileIndexTable;     /*! tile alias -> tile index */
   orxHASHTABLE *pstObjectPosTable;     /*! position -> object list */
+  orxHASHTABLE *pstTileSetsTable;      /*! */
   orxOBJECT *pstObject;                /*! Object created from zMapName for lifetime management */
   orxBODY *pstBody;                    /*! Body to add tile BodyParts to */
 } MapData;
