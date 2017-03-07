@@ -10,19 +10,19 @@ typedef struct SayHandle {
 } SayHandle;
 
 SayHandle *say_Create(orxSTRING _zSayName) {
-  SayHandle *sayHandle = orxNULL;
+  SayHandle *pstSayHandle = orxNULL;
 
   orxASSERT(_zSayName);
 
-  sayHandle = (SayHandle *)orxBank_Allocate(spstSayBank);
-  orxASSERT(sayHandle);
-  sayHandle->zName = _zSayName;
+  pstSayHandle = (SayHandle *)orxBank_Allocate(spstSayBank);
+  orxASSERT(pstSayHandle);
+  pstSayHandle->zName = _zSayName;
 
   orxConfig_PushSection(_zSayName);
-  sayHandle->zTrigger = orxConfig_GetString("Trigger");
-  sayHandle->zStyle = orxConfig_GetString("Style");
+  pstSayHandle->zTrigger = orxConfig_GetString("Trigger");
+  pstSayHandle->zStyle = orxConfig_GetString("Style");
 
-  orxHashTable_Add((orxU64)orxString_GetID(_zSayName), (void *) sayHandle);
+  orxHashTable_Add((orxU64)orxString_GetID(_zSayName), (void *) pstSayHandle);
 
   const orxSTRING zNextList = orxConfig_GetString("Next");
   orxS32 numNexts = orxConfig_GetListCounter(zNextList);
@@ -30,14 +30,14 @@ SayHandle *say_Create(orxSTRING _zSayName) {
     const orxSTRING zNextSay = orxConfig_GetListString(zNextList, i);
     SayHandle *pstStored = (SayHandle *)orxHashTable_Get(spstSayTable, (orxU64) orxString_GetID(zNextSay));
     if (pstStored != orxNULL) { /* pre-existing say handle */
-      orxLinkList_AddEnd(&sayHandle->stNextOptions, (orxLINKLIST_NODE *)pstStored);
+      orxLinkList_AddEnd(&pstSayHandle->stNextOptions, (orxLINKLIST_NODE *)pstStored);
     } else { /* new handle */
-      orxLinkList_AddEnd(&sayHandle->stNextOptions, (orxLINKLIST_NODE *)say_Create(zNextSay));
+      orxLinkList_AddEnd(&pstSayHandle->stNextOptions, (orxLINKLIST_NODE *)say_Create(zNextSay));
     }
   }
   orxConfig_PopSection();
 
-  return sayHandle;
+  return pstSayHandle;
 }
 
 orxSTATUS orxFASTCALL say_InputEventHandler(const orxEVENT *_pstEvent) {
