@@ -14,9 +14,10 @@ typedef struct SayHandle {
 } SayHandle;
 
 typedef struct SayState {
-  SayHandle *pstStartHandle;
+  const SayHandle *pstStartHandle;
   SayHandle *pstCurrentHandle;
-  orxOBJECT *pstSayObject;
+  SayHandle *pstCurrentNextHandle;
+  orxOBJECT *pstSayObject; /* Object to set text on */
 } SayState;
 
 SayHandle* say_GetHandle(orxSTRING _zSayName);
@@ -98,8 +99,15 @@ orxSTATUS say_Init() {
   return result;
 }
 
-SayHandle* say_Pick(orxLINKLIST *list) {
-  return orxNULL;
+SayHandle* say_PickByName(orxLINKLIST *_pstList, orxSTRING _zName) {
+  orxLINKLIST_NODE *pstCurrentOption = orxLinkList_GetFirst(*_pstList);
+  while (pstCurrentOption) {
+    SayHandle *pstOptionHandle = (SayHandle *) pstCurrentOption;
+    if (orxString_GetID(pstOptionHandle->zName) == orxString_GetID(_zName))
+      break;
+    pstCurrentOption = orxLinkList_GetNext(pstCurrentOption);
+  }
+  return (SayHandle *) pstCurrentOption;
 }
 
 void say_Trigger(SayHandle* _pstHandle) {
@@ -111,14 +119,43 @@ void init() {
   pstSayState = say_CreateState("SayText");
   pstSomeButton = orxObject_CreateFromConfig("SomeButton");
 }
+
+SayHandle* say_GetNextHandleByName(SayHandle *_pstHandle, const orxSTRING _zName) {
+  return say_PickByName(&(_pstHandle->stNextOptions), _zName);
+}
+void chooseNextHandle(orxObject *_pstObject, SayState *_pstSayState) {
+  const orxU32 u32NameID = orxString_GetID(orxObject_GetName(_pstObject));
+  switch(u32NameID) {
+  case orxString_GetID("Yes"):
+    _pstSayState->pstCurrentHandle = say_GetNextHandleByName("TextB");
+    break;
+  case orxString_GetID("No"):
+    _pstSayState->pstCurrentHandle = say_GetNextHandleByName("TextC");
+    break;
+  default:
+  }
+}
 void oninput() {
   if(orxInput_IsActive("Click") && orxInput_HasNewStatus("Click")) {
 		orxVECTOR mousePosition = { 0,0,0 };
 		orxMouse_GetPosition(&mousePosition);
     orxOBJECT *obj = orxObject_Pick(mousePosition, orxString_GetID("Clickable"));
-    say_Show(pstSayState->pstCurrentHandle);
-		orxObject_SetPosition(sparks, &sparksPosition);
+    obj = (obj != orxNULL) ? obj : orxObject_Pick(mousePosition, orxString_GetID("UIButton"));
+    if (orxObject_GetGroupID(obj) == orxString_GetID("UIButton")) {
+      chooseNextHandle(obj, pstSayState);
+    } else {
+      /* Creates state.pstSayObject and sets its text according to the state.pstCurrentHandle */
+      say_Show(pstSayState);
+    }
 	}
+  if(orxInput_IsActive("Up") && orxInput_HasNewStatus("Up")) {
+  }
+  if(orxInput_IsActive("Down") && orxInput_HasNewStatus("Down")) {
+  }
+  if(orxInput_IsActive("Cancel") && orxInput_HasNewStatus("Cancel")) {
+    say_Reset(pstSayState);
+    say_Hide(pstSayState);
+  }
 }
 void update() {
   if (pstSayState->pstPicked == orxNULL) {
