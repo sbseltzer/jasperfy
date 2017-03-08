@@ -1,3 +1,5 @@
+#include <orx.h>
+
 static orxBANK *spstSayStateBank;
 static orxBANK *spstSayHandleBank;
 static orxHASHTABLE *spstSayTable;
@@ -8,8 +10,8 @@ static orxHASHTABLE *spstSayTable;
  */
 typedef struct SayHandle {
   orxLINKLIST_NODE stNode;
-  orxSTRING zName;
-  orxSTRING zText;
+  const orxSTRING zName;
+  const orxSTRING zText;
   orxLINKLIST stNextOptions;
 } SayHandle;
 
@@ -24,7 +26,7 @@ typedef struct SayState {
 SayHandle* say_GetHandle(orxSTRING _zSayName);
 
 SayHandle *say_CreateHandle(orxSTRING _zSayName) {
-  SayHandle *pstSayHandle = (SayHandle *)orxHashTable_Get(spstSayTable, (orxU64) orxString_GetID(zNextSayName));
+  SayHandle *pstSayHandle = (SayHandle *)orxHashTable_Get(spstSayTable, (orxU64) orxString_GetID(_zSayName));
 
   if (pstSayHandle != orxNULL) {
     return pstSayHandle;
@@ -40,7 +42,7 @@ SayHandle *say_CreateHandle(orxSTRING _zSayName) {
 
   pstSayHandle->zText = orxConfig_GetString("Text");
 
-  orxHashTable_Add((orxU64)orxString_GetID(_zSayName), (void *) pstSayHandle);
+  orxHashTable_Add(spstSayTable, (orxU64) orxString_GetID(_zSayName), (void *) pstSayHandle);
 
   const orxSTRING zNextList = orxConfig_GetString("Next");
   orxS32 numNexts = orxConfig_GetListCounter(zNextList);
@@ -59,32 +61,32 @@ SayHandle *say_CreateHandle(orxSTRING _zSayName) {
 }
 
 SayHandle* say_GetHandle(orxSTRING _zSayName) {
-  SayHandle *pstSayHandle = (SayHandle *)orxHashTable_Get(spstSayTable, (orxU64) orxString_GetID(zNextSayName));
+  SayHandle *pstSayHandle = (SayHandle *)orxHashTable_Get(spstSayTable, (orxU64) orxString_GetID(_zSayName));
   if (pstSayHandle != orxNULL) {
     return pstSayHandle;
   }
   return say_CreateHandle(_zSayName);
 }
 SayState* say_CreateState(orxSTRING _zStateName) {
-  SayState *pstSayState = orxNULL;
+  SayState *pstReturnState = orxNULL;
 
   orxASSERT(_zStateName);
 
-  pstSayState = (SayHandle *)orxBank_Allocate(spstSayStateBank);
-  orxASSERT(pstSayState);
+  pstReturnState = (SayHandle *)orxBank_Allocate(spstSayStateBank);
+  orxASSERT(pstReturnState);
 
   orxConfig_PushSection(_zStateName);
   orxSTRING zSayHandleName = orxConfig_GetString("SayRoot");
   orxASSERT(zSayHandleName);
-  pstSayState->pstStartHandle = say_GetHandle(zSayHandleName);
-  orxASSERT(pstSayState->pstStartHandle);
-  pstSayState->pstCurrentHandle = pstSayState->pstStartHandle;
+  pstReturnState->pstStartHandle = say_GetHandle(zSayHandleName);
+  orxASSERT(pstReturnState->pstStartHandle);
+  pstReturnState->pstCurrentHandle = pstReturnState->pstStartHandle;
   orxConfig_PopSection();
 
-  pstSayState->pstNextHandle = orxNULL;
-  pstSayState->pstPreviousHandle = orxNULL;
+  pstReturnState->pstNextHandle = orxNULL;
+  pstReturnState->pstPreviousHandle = orxNULL;
 
-  return pstSayState;
+  return pstReturnState;
 }
 
 orxSTATUS orxFASTCALL say_InputEventHandler(const orxEVENT *_pstEvent) {
@@ -105,7 +107,7 @@ orxSTATUS say_Init() {
 }
 
 SayHandle* say_PickByName(orxLINKLIST *_pstList, orxSTRING _zName) {
-  orxLINKLIST_NODE *pstCurrentOption = orxLinkList_GetFirst(*_pstList);
+  orxLINKLIST_NODE *pstCurrentOption = orxLinkList_GetFirst(_pstList);
   while (pstCurrentOption) {
     SayHandle *pstOptionHandle = (SayHandle *) pstCurrentOption;
     if (orxString_GetID(pstOptionHandle->zName) == orxString_GetID(_zName))
@@ -116,29 +118,30 @@ SayHandle* say_PickByName(orxLINKLIST *_pstList, orxSTRING _zName) {
 }
 
 void say_ResolveNext(SayState* _pstState) {
-  _pstState->pstPreviousHandle = _pstState->_pstCurrentHandle;
+  _pstState->pstPreviousHandle = _pstState->pstCurrentHandle;
   _pstState->pstCurrentHandle = _pstState->pstNextHandle;
   _pstState->pstNextHandle = orxNULL;
   orxObject_SetTextString(_pstState->pstSayObject, _pstState->pstCurrentHandle->zText);
 }
 
+static SayState *spstSayState = orxNULL;
 void init() {
   say_Init();
-  pstSayState = say_CreateState("SayText");
-  pstSomeButton = orxObject_CreateFromConfig("SomeButton");
+  spstSayState = say_CreateState("SayText");
+  /* pstSomeButton = orxObject_CreateFromConfig("SomeButton"); */
 }
 
 SayHandle* say_GetNextHandleByName(SayHandle *_pstHandle, const orxSTRING _zName) {
   return say_PickByName(&(_pstHandle->stNextOptions), _zName);
 }
-void chooseNextHandle(orxObject *_pstObject, SayState *_pstSayState) {
+void chooseNextHandle(orxOBJECT *_pstObject, SayState *_pstSayState) {
   const orxU32 u32NameID = orxString_GetID(orxObject_GetName(_pstObject));
   switch(u32NameID) {
   case orxString_GetID("Yes"):
-    _pstSayState->pstCurrentHandle = say_GetNextHandleByName("TextB");
+    _pstSayState->pstCurrentHandle = say_GetNextHandleByName(_pstSayState->pstCurrentHandle, "TextB");
     break;
   case orxString_GetID("No"):
-    _pstSayState->pstCurrentHandle = say_GetNextHandleByName("TextC");
+    _pstSayState->pstCurrentHandle = say_GetNextHandleByName(_pstSayState->pstCurrentHandle, "TextC");
     break;
   default:
   }
@@ -150,10 +153,10 @@ void oninput() {
     orxOBJECT *obj = orxObject_Pick(mousePosition, orxString_GetID("Clickable"));
     obj = (obj != orxNULL) ? obj : orxObject_Pick(mousePosition, orxString_GetID("UIButton"));
     if (orxObject_GetGroupID(obj) == orxString_GetID("UIButton")) {
-      chooseNextHandle(obj, pstSayState);
+      chooseNextHandle(obj, spstSayState);
     } else {
       /* Creates state.pstSayObject and sets its text according to the state.pstCurrentHandle */
-      say_Show(pstSayState);
+      say_Show(spstSayState);
     }
 	}
   if(orxInput_IsActive("Up") && orxInput_HasNewStatus("Up")) {
@@ -161,13 +164,13 @@ void oninput() {
   if(orxInput_IsActive("Down") && orxInput_HasNewStatus("Down")) {
   }
   if(orxInput_IsActive("Cancel") && orxInput_HasNewStatus("Cancel")) {
-    say_Reset(pstSayState);
-    say_Hide(pstSayState);
+    say_Reset(spstSayState);
+    say_Hide(spstSayState);
   }
 }
 void update() {
-  if (pstSayState->pstPicked == orxNULL) {
-    SayHandle *pstCurrentOption = orxLinkList_GetFirst(pstSayState->stNextOptions);
+  if (spstSayState->pstPicked == orxNULL) {
+    SayHandle *pstCurrentOption = orxLinkList_GetFirst(spstSayState->stNextOptions);
     while (pstCurrentOption) {
       if (orxString_GetID(pstCurrentOption->zName) == orxString_GetID("TextA"))
       pstCurrentOption = (SayHandle *)orxLinkList_GetNext(pstCurrentOption);
