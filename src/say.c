@@ -9,14 +9,15 @@ static orxHASHTABLE *spstSayTable;
 typedef struct SayHandle {
   orxLINKLIST_NODE stNode;
   orxSTRING zName;
-  SayHandle *pstPrevious;
+  orxSTRING zText;
   orxLINKLIST stNextOptions;
 } SayHandle;
 
 typedef struct SayState {
   const SayHandle *pstStartHandle;
   SayHandle *pstCurrentHandle;
-  SayHandle *pstCurrentNextHandle;
+  SayHandle *pstPreviousHandle;
+  SayHandle *pstNextHandle;
   orxOBJECT *pstSayObject; /* Object to set text on */
 } SayState;
 
@@ -37,6 +38,8 @@ SayHandle *say_CreateHandle(orxSTRING _zSayName) {
 
   orxConfig_PushSection(_zSayName);
 
+  pstSayHandle->zText = orxConfig_GetString("Text");
+
   orxHashTable_Add((orxU64)orxString_GetID(_zSayName), (void *) pstSayHandle);
 
   const orxSTRING zNextList = orxConfig_GetString("Next");
@@ -48,7 +51,6 @@ SayHandle *say_CreateHandle(orxSTRING _zSayName) {
       orxLOG("Warning: SayHandle %s not found - skipping...", zNextSayName);
       continue;
     }
-    pstNextSay->pstPrevious = pstSayHandle;
     orxLinkList_AddEnd(&pstSayHandle->stNextOptions, (orxLINKLIST_NODE *)pstNextSay);
   }
   orxConfig_PopSection();
@@ -78,6 +80,9 @@ SayState* say_CreateState(orxSTRING _zStateName) {
   orxASSERT(pstSayState->pstStartHandle);
   pstSayState->pstCurrentHandle = pstSayState->pstStartHandle;
   orxConfig_PopSection();
+
+  pstSayState->pstNextHandle = orxNULL;
+  pstSayState->pstPreviousHandle = orxNULL;
 
   return pstSayState;
 }
@@ -110,8 +115,11 @@ SayHandle* say_PickByName(orxLINKLIST *_pstList, orxSTRING _zName) {
   return (SayHandle *) pstCurrentOption;
 }
 
-void say_Trigger(SayHandle* _pstHandle) {
-  orxOBJECT *sayObject = orxObject_CreateFromConfig(_pstHandle->zName);
+void say_ResolveNext(SayState* _pstState) {
+  _pstState->pstPreviousHandle = _pstState->_pstCurrentHandle;
+  _pstState->pstCurrentHandle = _pstState->pstNextHandle;
+  _pstState->pstNextHandle = orxNULL;
+  orxObject_SetTextString(_pstState->pstSayObject, _pstState->pstCurrentHandle->zText);
 }
 
 void init() {
