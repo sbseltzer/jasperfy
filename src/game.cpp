@@ -38,6 +38,16 @@ orxSTATUS orxFASTCALL Bootstrap()
   return eResult;
 }
 
+orxSTATUS orxFASTCALL InputEventHandler(const orxEVENT *_pstEvent) {
+  orxSTATUS eResult = orxSTATUS_SUCCESS;
+  orxINPUT_EVENT_PAYLOAD *pstPayload = (orxINPUT_EVENT_PAYLOAD *)_pstEvent->pstPayload;
+  if (_pstEvent->eID == orxINPUT_EVENT_ON) {
+  }
+  if (_pstEvent->eID == orxINPUT_EVENT_OFF) {
+  }
+  return eResult;
+}
+
 orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
 {
   orxSTATUS eResult = orxSTATUS_SUCCESS;
@@ -55,8 +65,26 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
   return eResult;
 }
 
+static orxOBJECT *pstTextObject = orxNULL;
+static orxU32 u32CurrentKey = 0;
 void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pstContext)
 {
+  if (orxInput_IsActive("TestTrigger") && orxInput_HasNewStatus("TestTrigger")) {
+    orxConfig_PushSection("PlayerFlowerInteraction");
+    const orxU32 u32SayKeyCount = orxConfig_GetKeyCounter();
+    for (; u32CurrentKey < u32SayKeyCount; u32CurrentKey++) {
+      const orxSTRING zCurrentKey = orxConfig_GetKey(u32CurrentKey);
+      // if (prompt)
+      // const orxSTRING zCurrentValue = orxConfig_GetString();
+    }
+
+    const orxSTRING zNextList = orxConfig_GetString("Next");
+    orxS32 numNexts = orxConfig_GetListCounter(zNextList);
+    for (orxS32 i = 0; i < numNexts; i++) {
+      const orxSTRING zNextSayName = orxConfig_GetListString(zNextList, i);
+    }
+    orxConfig_PopSection();
+  }
 }
 
 orxSTATUS orxFASTCALL Init()
@@ -72,6 +100,8 @@ orxSTATUS orxFASTCALL Init()
 
   // Creates pstScene
   pstScene = orxObject_CreateFromConfig("Scene");
+  pstTextObject = orxObject_CreateFromConfig("SayText");
+  pstTextObject = (orxOBJECT *)orxObject_GetChild(pstTextObject);
 
   // Add physics event handler
   orxEvent_AddHandler(orxEVENT_TYPE_PHYSICS, PhysicsEventHandler);
@@ -81,6 +111,20 @@ orxSTATUS orxFASTCALL Init()
   orxClock_Register(pstClock, Update, orxNULL, orxMODULE_ID_MAIN, orxCLOCK_PRIORITY_NORMAL);
 
   map_LoadMapData("MyCoolMapLayer");
+
+  orxConfig_PushSection("PlayerFlowerInteraction");
+  orxU32 counter = orxConfig_GetKeyCounter();
+  for (orxU32 i = 0; i < counter; i++) {
+    const orxSTRING key = orxConfig_GetKey(i);
+    if (key == orxSTRING_EMPTY)
+      continue;
+    const orxSTRING value = orxConfig_GetString(key);
+    orxLOG("%s = %s", key, value);
+    // orxU32 length = orxString_GetLength(key) + 1
+    // orxSTRING zOptions = alloca()
+    // orxBOOL bIsPrompt = ()
+  }
+  orxConfig_PopSection();
 
   // Done!
   return eResult;
