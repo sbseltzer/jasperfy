@@ -1,5 +1,7 @@
 #include <orx.h>
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 static orxBANK *spstSayStateBank;
 static orxBANK *spstSayHandleBank;
 static orxHASHTABLE *spstSayTable;
@@ -136,27 +138,22 @@ SayHandle* say_GetNextHandleByName(SayHandle *_pstHandle, const orxSTRING _zName
 }
 void chooseNextHandle(orxOBJECT *_pstObject, SayState *_pstSayState) {
   const orxU32 u32NameID = orxString_GetID(orxObject_GetName(_pstObject));
-  switch(u32NameID) {
-  case orxString_GetID("Yes"):
+  if(u32NameID == orxString_GetID("Yes"))
     _pstSayState->pstCurrentHandle = say_GetNextHandleByName(_pstSayState->pstCurrentHandle, "TextB");
-    break;
-  case orxString_GetID("No"):
+  else if(u32NameID == orxString_GetID("No"))
     _pstSayState->pstCurrentHandle = say_GetNextHandleByName(_pstSayState->pstCurrentHandle, "TextC");
-    break;
-  default:
-  }
 }
 void oninput() {
   if(orxInput_IsActive("Click") && orxInput_HasNewStatus("Click")) {
 		orxVECTOR mousePosition = { 0,0,0 };
 		orxMouse_GetPosition(&mousePosition);
-    orxOBJECT *obj = orxObject_Pick(mousePosition, orxString_GetID("Clickable"));
-    obj = (obj != orxNULL) ? obj : orxObject_Pick(mousePosition, orxString_GetID("UIButton"));
+    orxOBJECT *obj = orxObject_Pick(&mousePosition, orxString_GetID("Clickable"));
+    obj = (obj != orxNULL) ? obj : orxObject_Pick(&mousePosition, orxString_GetID("UIButton"));
     if (orxObject_GetGroupID(obj) == orxString_GetID("UIButton")) {
       chooseNextHandle(obj, spstSayState);
     } else {
       /* Creates state.pstSayObject and sets its text according to the state.pstCurrentHandle */
-      say_Show(spstSayState);
+      /* say_Show(spstSayState); */
     }
 	}
   if(orxInput_IsActive("Up") && orxInput_HasNewStatus("Up")) {
@@ -164,19 +161,11 @@ void oninput() {
   if(orxInput_IsActive("Down") && orxInput_HasNewStatus("Down")) {
   }
   if(orxInput_IsActive("Cancel") && orxInput_HasNewStatus("Cancel")) {
-    say_Reset(spstSayState);
-    say_Hide(spstSayState);
+    /* say_Reset(spstSayState); */
+    /* say_Hide(spstSayState); */
   }
 }
-void update() {
-  if (spstSayState->pstPicked == orxNULL) {
-    SayHandle *pstCurrentOption = orxLinkList_GetFirst(spstSayState->stNextOptions);
-    while (pstCurrentOption) {
-      if (orxString_GetID(pstCurrentOption->zName) == orxString_GetID("TextA"))
-      pstCurrentOption = (SayHandle *)orxLinkList_GetNext(pstCurrentOption);
-    }
-  }
+
+#ifdef __cplusplus
 }
-void exit() {
-  say_Exit();
-}
+#endif
